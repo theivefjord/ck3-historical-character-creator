@@ -23,8 +23,8 @@ private:
     Ui::MainWindow *ui;
     QString currentFile;
     QMap<QString, QString> fieldValues;
-    QList<QMap<QString, QString>> characters;
-    QString formatCharacter(const QMap<QString, QString> &character, const QStringList &fieldOrder, int characterIndex);
+    QList<QMap<QString, QVariant>> characters;
+    QString formatCharacter(const QMap<QString, QVariant> &character, const QStringList &fieldOrder, int characterIndex);
     const QStringList fieldOrder = {
         "name", "dynasty", "dna", "female", "culture", "religion", "disallow_random_traits", "birth", "death"
     };
@@ -42,6 +42,7 @@ private slots:
     void on_addCharacter_clicked();
     void on_female_checkBox_stateChanged(int arg1);
     void on_rtraits_checkBox_stateChanged(int arg1);
+    void on_traitButton_clicked();
 };
 
 #endif // MAINWINDOW_H

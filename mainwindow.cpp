@@ -23,7 +23,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->dynField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->bdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
-    characters.append(QMap<QString, QString>());
+    characters.append(QMap<QString, QVariant>());
+    // trait buttons
+    QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
+    for (QPushButton *button : traitButtons)
+    {
+        connect(button, &QPushButton::clicked, this, &MainWindow::on_traitButton_clicked);
+    }
     // setup trait tabs
     QSizePolicy sp_retain = ui->traitTabs->sizePolicy();
     sp_retain.setRetainSizeWhenHidden(true);
@@ -144,29 +150,38 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QString MainWindow::formatCharacter(const QMap<QString, QString> &character, const QStringList &fieldOrder, int characterIndex)
+QString MainWindow::formatCharacter(const QMap<QString, QVariant> &character, const QStringList &fieldOrder, int characterIndex)
 {
     QString formattedText;
 
     if (character.contains("dynasty"))
     {
-        QString dynasty = character["dynasty"];
+        QString dynasty = character["dynasty"].toString();
         formattedText += QString("%1_%2 = {\n").arg(dynasty).arg(characterIndex);
     }
 
     for (const QString &orderedKey : fieldOrder)
     {
-        if (orderedKey == "birth" && character.contains(orderedKey) && !character[orderedKey].isEmpty())
+        if (orderedKey == "birth" && character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
         {
-            formattedText += QString("    %1 = {\n        birth = yes\n    }\n").arg(character[orderedKey]);
+            formattedText += QString("    %1 = {\n        birth = yes\n    }\n").arg(character[orderedKey].toString());
         }
-        else if (orderedKey == "death" && character.contains(orderedKey) && !character[orderedKey].isEmpty())
+        else if (orderedKey == "death" && character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
         {
-            formattedText += QString("    %1 = { death = yes }\n").arg(character[orderedKey]);
+            formattedText += QString("    %1 = { death = yes }\n").arg(character[orderedKey].toString());
         }
-        else if (character.contains(orderedKey) && !character[orderedKey].isEmpty())
+        else if (character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
         {
-            formattedText += QString("    %1 = %2\n").arg(orderedKey, character[orderedKey]);
+            formattedText += QString("    %1 = %2\n").arg(orderedKey, character[orderedKey].toString());
+        }
+    }
+
+    if (character.contains("traits"))
+    {
+        QStringList traits = character["traits"].toStringList();
+        for (const QString &trait : traits)
+        {
+            formattedText += QString("  trait = %1\n").arg(trait);
         }
     }
     formattedText += "}\n\n";
@@ -214,9 +229,44 @@ void MainWindow::on_FieldEdited(const QString &text)
     }
 }
 
+void MainWindow::on_traitButton_clicked()
+{
+    QPushButton *button = qobject_cast<QPushButton*>(sender());
+    if (!button || characters.isEmpty())
+        return;
+
+    QString traitName = button->objectName();
+    if (traitName.isEmpty())
+        return;
+
+    QMap<QString, QVariant> &activeCharacter = characters.last();
+
+    QStringList traits = activeCharacter.value("traits").toStringList();
+
+    if (button->isChecked())
+    {
+        if (!traits.contains(traitName))
+            traits.append(traitName);
+    }
+    else
+    {
+        traits.removeAll(traitName);
+    }
+
+    activeCharacter["traits"] = traits;
+
+    QString updatedText;
+    for (int i = 0; i < characters.size(); ++i)
+    {
+        updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
+    }
+
+    ui->openFileEdit_newchars->setPlainText(updatedText);
+}
+
 void MainWindow::on_addCharacter_clicked()
 {
-    QMap<QString, QString> currentCharacter;
+    QMap<QString, QVariant> currentCharacter;
     currentCharacter["name"] = ui->nameField->text();
     currentCharacter["dna"] = ui->dnaField->text();
     currentCharacter["father"] = "";
@@ -255,7 +305,7 @@ void MainWindow::on_female_checkBox_stateChanged(int state)
     if (characters.isEmpty())
         return;
 
-    QMap<QString, QString> &activeCharacter = characters[characters.size() - 1];
+    QMap<QString, QVariant> &activeCharacter = characters[characters.size() - 1];
 
     if (state == Qt::Checked)
     {
@@ -283,7 +333,7 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
     if (characters.isEmpty())
         return;
 
-    QMap<QString, QString> &activeCharacter = characters[characters.size() - 1];
+    QMap<QString, QVariant> &activeCharacter = characters[characters.size() - 1];
 
     if (state == Qt::Checked)
     {
