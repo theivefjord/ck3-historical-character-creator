@@ -1,9 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "characterdata.h"
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QTextStream>
+#include <QGraphicsItem>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,11 +25,11 @@ private:
     Ui::MainWindow *ui;
     QString currentFile;
     QMap<QString, QString> fieldValues;
-    QList<QMap<QString, QVariant>> characters;
-    QString formatCharacter(const QMap<QString, QVariant> &character, const QStringList &fieldOrder, int characterIndex);
-    const QStringList fieldOrder = {
-        "name", "dynasty", "dna", "female", "culture", "religion", "disallow_random_traits", "birth", "death"
-    };
+    QString formatCharacter(CharacterData *character, int characterIndex);
+    QGraphicsScene *familyTreeScene;
+    QList<CharacterData*> characters;
+    QMap<QString, CharacterData*> charactersById;
+    void addCharacterToScene(CharacterData *character);
 
 
 private slots:
@@ -43,6 +45,7 @@ private slots:
     void on_female_checkBox_stateChanged(int arg1);
     void on_rtraits_checkBox_stateChanged(int arg1);
     void on_traitButton_clicked();
+    void updateAllCharacterText();
 };
 
 #endif // MAINWINDOW_H

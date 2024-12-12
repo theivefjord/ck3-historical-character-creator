@@ -1,8 +1,11 @@
 #include "mainwindow.h"
+#include "charactertoken.h"
 #include "ui_mainwindow.h"
 #include "QMessageBox"
 #include "QRegularExpression"
 #include "QScrollBar"
+#include "characterdata.h"
+#include <QUuid>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,7 +26,16 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->dynField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->bdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
-    characters.append(QMap<QString, QVariant>());
+    // create initial character
+    CharacterData *initialCharacter = new CharacterData();
+    initialCharacter->characterNumber = 1;
+    initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
+    characters.append(initialCharacter);
+    // family tree stuff
+    familyTreeScene = new QGraphicsScene(this);
+    ui->familyTreeView->setScene(familyTreeScene);
+    addCharacterToScene(initialCharacter);
+    // To connect the token signal
     // trait buttons
     QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
     for (QPushButton *button : traitButtons)
@@ -150,49 +162,69 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-QString MainWindow::formatCharacter(const QMap<QString, QVariant> &character, const QStringList &fieldOrder, int characterIndex)
+QString MainWindow::formatCharacter(CharacterData *character, int characterIndex)
 {
     QString formattedText;
 
-    if (character.contains("dynasty"))
+    if (!character->dynasty.isEmpty())
     {
-        QString dynasty = character["dynasty"].toString();
-        formattedText += QString("%1_%2 = {\n").arg(dynasty).arg(characterIndex);
+        formattedText += QString("%1_%2 = {\n").arg(character->dynasty).arg(characterIndex);
+    }
+    else
+    {
+        formattedText += QString("character_%1 = {\n").arg(character->dynasty);
     }
 
-    for (const QString &orderedKey : fieldOrder)
+    if (!character->name.isEmpty())
+        formattedText += QString ("    name = \%1\n").arg(character->name);
+    if (!character->dna.isEmpty())
+        formattedText += QString ("    dna = \%1\n").arg(character->dna);
+    if (!character->dynasty.isEmpty())
+        formattedText += QString("    dynasty = \%1\n").arg(character->dynasty);
+    if (!character->culture.isEmpty())
+        formattedText += QString ("    culture = \%1\n").arg(character->culture);
+    if (!character->religion.isEmpty())
+        formattedText += QString ("    religion = \%1\n").arg(character->religion);
+
+    if (character->gender == "female")
+        formattedText += QString ("    female = yes\n");
+
+    if (!character->birth.isEmpty())
+        formattedText += QString ("    %1 = {\n        birth = yes\n    }\n").arg(character->birth);
+
+    if (!character->death.isEmpty())
+        formattedText += QString ("    %1 = { death = yes }\n").arg(character->death);
+
+    if (character->disallowRandomTraits == true)
     {
-        if (orderedKey == "birth" && character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
-        {
-            formattedText += QString("    %1 = {\n        birth = yes\n    }\n").arg(character[orderedKey].toString());
-        }
-        else if (orderedKey == "death" && character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
-        {
-            formattedText += QString("    %1 = { death = yes }\n").arg(character[orderedKey].toString());
-        }
-        else if (character.contains(orderedKey) && !character[orderedKey].toString().isEmpty())
-        {
-            formattedText += QString("    %1 = %2\n").arg(orderedKey, character[orderedKey].toString());
-        }
+        formattedText += QString("    disallow_random_traits = yes\n");
     }
 
-    if (character.contains("traits"))
+    for (const QString &trait : character->traits)
     {
-        QStringList traits = character["traits"].toStringList();
-        for (const QString &trait : traits)
-        {
-            formattedText += QString("  trait = %1\n").arg(trait);
-        }
+        formattedText += QString("    trait = %1\n").arg(trait);
     }
+
+    for (const QString &spouseId : character->spouseIds)
+    {
+        formattedText += QString("    add_spouse = %1\n").arg(spouseId);
+    }
+
     formattedText += "}\n\n";
     return formattedText;
 }
 
 void MainWindow::on_FieldEdited(const QString &text)
 {
-    QLineEdit *lineEdit = qobject_cast<QLineEdit *>(sender());
-    QString key;
+    //CharacterData *activeChar = characters.last();
+    if (characters.isEmpty())
+        return;
 
+    QLineEdit *lineEdit = qobject_cast<QLineEdit*>(sender());
+    if (!lineEdit)
+        return;
+
+    QString key;
     if (lineEdit == ui->nameField)
         key = "name";
     else if (lineEdit == ui->dnaField)
@@ -208,25 +240,35 @@ void MainWindow::on_FieldEdited(const QString &text)
     else if (lineEdit == ui->deathdayField)
         key = "death";
 
-    if (!key.isEmpty() && !characters.isEmpty())
+    if (key.isEmpty())
+        return;
+
+    CharacterData *activeChar = characters.last();
+    if (key == "name")
+        activeChar->name = text;
+    else if (key == "dna")
+        activeChar->dna = text;
+    else if (key == "religion")
+        activeChar->religion = text;
+    else if (key == "culture")
+        activeChar->culture = text;
+    else if (key == "dynasty")
+        activeChar->dynasty = text;
+    else if (key == "birth")
+        activeChar->birth = text;
+    else if (key == "death")
+        activeChar->death = text;
+
+    QScrollBar *scrollBar = ui->openFileEdit_newchars->verticalScrollBar();
+    int scrollPosition = scrollBar->value();
+
+    QString updatedText;
+    for (int i = 0; i < characters.size(); ++i)
     {
-        // scrollbar stuff
-        QScrollBar *scrollBar = ui->openFileEdit_newchars->verticalScrollBar();
-        int scrollPosition = scrollBar->value();
-
-        characters[characters.size() - 1][key] = text;
-
-        QString updatedText;
-
-        for (int i = 0; i < characters.size(); ++i)
-        {
-            updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
-        }
-
-        ui->openFileEdit_newchars->setPlainText(updatedText);
-
-        scrollBar->setValue(scrollPosition);
+        updatedText += formatCharacter(characters[i], i+1);
     }
+    ui->openFileEdit_newchars->setPlainText(updatedText);
+    scrollBar->setValue(scrollPosition);
 }
 
 void MainWindow::on_traitButton_clicked()
@@ -239,9 +281,9 @@ void MainWindow::on_traitButton_clicked()
     if (traitName.isEmpty())
         return;
 
-    QMap<QString, QVariant> &activeCharacter = characters.last();
+    CharacterData *activeCharacter = characters.last();
 
-    QStringList traits = activeCharacter.value("traits").toStringList();
+    QStringList traits = activeCharacter->traits;
 
     if (button->isChecked())
     {
@@ -253,12 +295,12 @@ void MainWindow::on_traitButton_clicked()
         traits.removeAll(traitName);
     }
 
-    activeCharacter["traits"] = traits;
+    activeCharacter->traits = traits;
 
     QString updatedText;
     for (int i = 0; i < characters.size(); ++i)
     {
-        updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
+        updatedText += formatCharacter(characters[i], i + 1);
     }
 
     ui->openFileEdit_newchars->setPlainText(updatedText);
@@ -266,36 +308,66 @@ void MainWindow::on_traitButton_clicked()
 
 void MainWindow::on_addCharacter_clicked()
 {
-    QMap<QString, QVariant> currentCharacter;
-    currentCharacter["name"] = ui->nameField->text();
-    currentCharacter["dna"] = ui->dnaField->text();
-    currentCharacter["father"] = "";
-    currentCharacter["mother"] = "";
-    currentCharacter["religion"] = ui->religionField->text();
-    currentCharacter["culture"] = ui->cultureField->text();
-    currentCharacter["dynasty"] = ui->dynField->text();
-    currentCharacter["birth"] = ui->bdayField->text();
-    currentCharacter["death"] = ui->deathdayField->text();
+    if (characters.isEmpty())
+        return;
 
-    characters.append(currentCharacter);
+    CharacterData *currentCharacter = characters.last();
 
-    //ui->nameField->clear();
-    //ui->dnaField->clear();
-    //ui->religionField->clear();
-    //ui->cultureField->clear();
-    //ui->dynField->clear();
-    //ui->bdayField->clear();
-    //ui->deathdayField->clear();
+    // first get the characterNumber
+    int charIndex = characters.size();
+    currentCharacter->characterNumber = charIndex;
+
+    currentCharacter->characterNumber = charIndex;
+    currentCharacter->name = ui->nameField->text();
+    currentCharacter->dna = ui->dnaField->text();
+    currentCharacter->fatherId = "";
+    currentCharacter->motherId = "";
+    currentCharacter->religion = ui->religionField->text();
+    currentCharacter->culture = ui->cultureField->text();
+    currentCharacter->dynasty = ui->dynField->text();
+    currentCharacter->birth = ui->bdayField->text();
+    currentCharacter->death = ui->deathdayField->text();
+
+    // assign the id for spouse/father/mother etc
+    if (!currentCharacter->dynasty.isEmpty())
+        currentCharacter->id = currentCharacter->dynasty + "_" + QString::number(currentCharacter->characterNumber);
+    else
+        currentCharacter->id = "character_" + QString::number(currentCharacter->characterNumber);
+
+    charactersById[currentCharacter->id] = currentCharacter;
+
+
+
     ui->female_checkBox->setChecked(false);
     ui->rtraits_checkBox->setChecked(false);
 
-    QString updatedText;
+    CharacterData *newCharacter = new CharacterData();
+    int newCharIndex = characters.size() + 1;
+    newCharacter->characterNumber = newCharIndex;
+    newCharacter->name = ui->nameField->text();
+    newCharacter->dna = ui->dnaField->text();
+    newCharacter->fatherId = "";
+    newCharacter->motherId = "";
+    newCharacter->religion = ui->religionField->text();
+    newCharacter->culture = ui->cultureField->text();
+    newCharacter->dynasty = ui->dynField->text();
+    newCharacter->birth = ui->bdayField->text();
+    newCharacter->death = ui->deathdayField->text();
 
+    // assign the id for spouse/father/mother etc
+    if (!newCharacter->dynasty.isEmpty())
+        newCharacter->id = newCharacter->dynasty + "_" + QString::number(newCharacter->characterNumber);
+    else
+        newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
+
+    characters.append(newCharacter);
+    addCharacterToScene(newCharacter);
+    // update the displayed text
+    QString updatedText;
     for (int i = 0; i < characters.size(); ++i)
     {
-        updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
+        updatedText += formatCharacter(characters[i], i + 1);
     }
-
     ui->openFileEdit_newchars->setPlainText(updatedText);
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
@@ -305,22 +377,22 @@ void MainWindow::on_female_checkBox_stateChanged(int state)
     if (characters.isEmpty())
         return;
 
-    QMap<QString, QVariant> &activeCharacter = characters[characters.size() - 1];
+    CharacterData *activeCharacter = characters.last();
 
     if (state == Qt::Checked)
     {
-        activeCharacter["female"] = "yes";
+        activeCharacter->gender = "female";
     }
     else
     {
-        activeCharacter.remove("female");
+        activeCharacter->gender = "";
     }
 
     QString updatedText;
 
     for (int i = 0; i < characters.size(); ++i)
     {
-        updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
+        updatedText += formatCharacter(characters[i], i + 1);
     }
 
     ui->openFileEdit_newchars->setPlainText(updatedText);
@@ -333,16 +405,16 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
     if (characters.isEmpty())
         return;
 
-    QMap<QString, QVariant> &activeCharacter = characters[characters.size() - 1];
+    CharacterData *activeCharacter = characters.last();
 
     if (state == Qt::Checked)
     {
-        activeCharacter["disallow_random_traits"] = "yes";
+        activeCharacter->disallowRandomTraits = true;
         ui->traitTabs->setVisible(true);
     }
     else
     {
-        activeCharacter.remove("disallow_random_traits");
+        activeCharacter->disallowRandomTraits = false;
         ui->traitTabs->setVisible(false);
     }
 
@@ -350,10 +422,27 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
 
     for (int i = 0; i < characters.size(); ++i)
     {
-        updatedText += formatCharacter(characters[i], fieldOrder, i + 1);
+        updatedText += formatCharacter(characters[i], i + 1);
     }
 
     ui->openFileEdit_newchars->setPlainText(updatedText);
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+}
+void MainWindow::updateAllCharacterText()
+{
+    QString updatedText;
+    for (int i = 0; i < characters.size(); ++i)
+    {
+        updatedText += formatCharacter(characters[i], characters[i]->characterNumber);
+    }
+    ui->openFileEdit_newchars->setPlainText(updatedText);
+}
+
+void MainWindow::addCharacterToScene(CharacterData *character)
+{
+    CharacterToken *token = new CharacterToken(character);
+    // connect token signal to slot in MainWindow
+    connect(token, &CharacterToken::relationshipsChanged, this, &MainWindow::updateAllCharacterText);
+    familyTreeScene->addItem(token);
 }
 
