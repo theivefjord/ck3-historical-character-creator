@@ -5,7 +5,7 @@
 #include "QRegularExpression"
 #include "QScrollBar"
 #include "characterdata.h"
-#include <QUuid>
+#include "QValidator"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -19,23 +19,28 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->actionReload_File, &QAction::triggered, this, &MainWindow::reloadFile);
     currentFile = "";
     setWindowTitle(tr("Untitled"));
+    // datevalidator stuff
+    QRegularExpression re("^\\d+\\.(1[0-2]|[1-9])\\.(30|[12]\\d|[1-9])$");
+    QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
+
     connect(ui->nameField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->dnaField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->religionField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->cultureField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->dynField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->bdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
+    ui->bdayField->setValidator(dateValidator);
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
-    // create initial character
+    ui->deathdayField->setValidator(dateValidator);
+    // create example character
     CharacterData *initialCharacter = new CharacterData();
-    initialCharacter->characterNumber = 1;
-    initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
-    characters.append(initialCharacter);
+    exampleCharacterSelection(initialCharacter);
+
     // family tree stuff
     familyTreeScene = new QGraphicsScene(this);
     ui->familyTreeView->setScene(familyTreeScene);
     addCharacterToScene(initialCharacter);
-    // To connect the token signal
+
     // trait buttons
     QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
     for (QPushButton *button : traitButtons)
@@ -47,6 +52,39 @@ MainWindow::MainWindow(QWidget *parent)
     sp_retain.setRetainSizeWhenHidden(true);
     ui->traitTabs->setSizePolicy(sp_retain);
     ui->traitTabs->setVisible(false);
+}
+
+void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
+{
+    int randNum = rand() % 5;
+    if (randNum == 1 || 2 || 3 || 4){
+        // Set initial text in line edits
+        ui->nameField->setText("Henry");
+        ui->dynField->setText("normandy");
+        ui->religionField->setText("catholic");
+        ui->cultureField->setText("english");
+        ui->dnaField->setText("normandy_1");
+        ui->bdayField->setText("1068.8.20");
+        ui->deathdayField->setText("1135.12.1");
+
+
+        initialCharacter->characterNumber = 1;
+        initialCharacter->id = "character_1";
+        initialCharacter->name = "Henry";
+        initialCharacter->dynasty = "normandy";
+        initialCharacter->religion = "catholic";
+        initialCharacter->culture = "english";
+        initialCharacter->dna = "normandy_1";
+        initialCharacter->birth = "1068.8.20";
+        initialCharacter->death = "1135.12.1";
+        characters.append(initialCharacter);
+        // Update text output
+        QString updatedText;
+        for (int i = 0; i < characters.size(); ++i) {
+            updatedText += formatCharacter(characters[i], i + 1);
+        }
+        ui->openFileEdit_newchars->setPlainText(updatedText);
+    }
 }
 
 void MainWindow::openFile()
@@ -189,11 +227,11 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
     if (character->gender == "female")
         formattedText += QString ("    female = yes\n");
 
-    if (!character->birth.isEmpty())
-        formattedText += QString ("    %1 = {\n        birth = yes\n    }\n").arg(character->birth);
+    if (!character->fatherId.isEmpty())
+        formattedText += QString ("    father = \%1\n").arg(character->fatherId);
 
-    if (!character->death.isEmpty())
-        formattedText += QString ("    %1 = { death = yes }\n").arg(character->death);
+    if (!character->motherId.isEmpty())
+        formattedText += QString ("    mother = \%1\n").arg(character->motherId);
 
     if (character->disallowRandomTraits == true)
     {
@@ -202,13 +240,54 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
 
     for (const QString &trait : character->traits)
     {
-        formattedText += QString("    trait = %1\n").arg(trait);
+        if (trait.contains("i_e_")){
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_intrigue_" + traitParts[2];
+            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+        }
+        else if (trait.contains("d_e_")){
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_diplomacy_" + traitParts[2];
+            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+        }
+        else if (trait.contains("s_e_")){
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_stewardship_" + traitParts[2];
+            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+        }
+        else if (trait.contains("m_e_")){
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_martial_" + traitParts[2];
+            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+        }
+        else if (trait.contains("l_e_")){
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_learning_" + traitParts[2];
+            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+        }
+        else
+            formattedText += QString("    trait = %1\n").arg(trait);
     }
+
+    if (!character->birth.isEmpty())
+        formattedText += QString ("    %1 = { birth = yes }\n").arg(character->birth);
 
     for (const QString &spouseId : character->spouseIds)
     {
-        formattedText += QString("    add_spouse = %1\n").arg(spouseId);
+        QStringList birthParts = character->birth.split('.');
+        int birthyearPlus16 = 0;
+        //QString earliestMarryDate = "x.x.x";
+        if (birthParts.size() == 3){
+            int birthYear = birthParts[0].toInt();
+            birthyearPlus16 = birthYear + 16;
+        }
+        QString earliestMarryDate = QString::number(birthyearPlus16) + "." + birthParts[1] + "." + birthParts[2];
+        formattedText += QString("    %2 = { add_spouse = %1 }\n").arg(spouseId).arg(earliestMarryDate);
     }
+
+    if (!character->death.isEmpty())
+        formattedText += QString ("    %1 = { death = yes }\n").arg(character->death);
+
 
     formattedText += "}\n\n";
     return formattedText;
@@ -316,8 +395,6 @@ void MainWindow::on_addCharacter_clicked()
     // first get the characterNumber
     int charIndex = characters.size();
     currentCharacter->characterNumber = charIndex;
-
-    currentCharacter->characterNumber = charIndex;
     currentCharacter->name = ui->nameField->text();
     currentCharacter->dna = ui->dnaField->text();
     currentCharacter->fatherId = "";
@@ -328,18 +405,29 @@ void MainWindow::on_addCharacter_clicked()
     currentCharacter->birth = ui->bdayField->text();
     currentCharacter->death = ui->deathdayField->text();
 
+    // store old id before changing it
+    QString oldId = currentCharacter->id;
+
     // assign the id for spouse/father/mother etc
     if (!currentCharacter->dynasty.isEmpty())
         currentCharacter->id = currentCharacter->dynasty + "_" + QString::number(currentCharacter->characterNumber);
     else
         currentCharacter->id = "character_" + QString::number(currentCharacter->characterNumber);
 
+    // Remove the old entry from tokensById
+    if (tokensById.contains(oldId)) {
+        // remove old id
+        CharacterToken *token = tokensById.take(oldId);
+        tokensById[currentCharacter->id] = token; // Reinsert with new id
+    } else {
+        qDebug() << "if this prints something's wrong with the tokens";
+    }
+
     charactersById[currentCharacter->id] = currentCharacter;
 
 
 
-    ui->female_checkBox->setChecked(false);
-    ui->rtraits_checkBox->setChecked(false);
+
 
     CharacterData *newCharacter = new CharacterData();
     int newCharIndex = characters.size() + 1;
@@ -370,6 +458,8 @@ void MainWindow::on_addCharacter_clicked()
     }
     ui->openFileEdit_newchars->setPlainText(updatedText);
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->female_checkBox->setChecked(false);
+    ui->rtraits_checkBox->setChecked(false);
 }
 
 void MainWindow::on_female_checkBox_stateChanged(int state)
@@ -443,6 +533,65 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     CharacterToken *token = new CharacterToken(character);
     // connect token signal to slot in MainWindow
     connect(token, &CharacterToken::relationshipsChanged, this, &MainWindow::updateAllCharacterText);
+    connect(token, &CharacterToken::spousesSet, this, &MainWindow::drawSpouseLine);
+    connect(token, &CharacterToken::parentSet, this, &MainWindow::drawParentLine);
+
+    // start at base position
+    int x = 0, y = 0;
+    token->setPos(x, y);
     familyTreeScene->addItem(token);
+
+    while (!token->collidingItems().isEmpty()) {
+        x += 20;
+        token->setPos(x, y);
+
+        if (x > 500){
+            x = 0;
+            y += 80;
+            token->setPos(x, y);
+        }
+    }
+
+    tokensById[character->id] = token;
+}
+
+void MainWindow::drawParentLine(QString char1Id, QString char2Id)
+{
+
+}
+
+void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
+{
+    //qDebug() << "drawSpouseLine called with:" << char1Id << char2Id;
+
+    //if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
+    //{
+    //    qDebug() << "one of the tokens is not in tokensbyid.";
+    //    return;
+    //}
+
+    CharacterToken *token1 = tokensById[char1Id];
+    CharacterToken *token2 = tokensById[char2Id];
+
+    // get positions
+    QPointF pos2 = token2->scenePos();
+    token1->setPos(pos2.x() - 120, pos2.y()); // align tokens for line
+    QPointF pos1 = token1->scenePos();
+
+    //qDebug() << "pos1:" << pos1 << "pos2" << pos2;
+
+
+    // create a line item between them
+    QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(pos1.x() + 100, pos1.y() + 25, pos2.x(), pos2.y() + 25));
+    line->setPen(QPen(Qt::white, 3));
+    // add line
+    familyTreeScene->addItem(line);
+
+    QGraphicsItemGroup *spouseGroup = familyTreeScene->createItemGroup({token1, token2, line});
+    spouseGroup->setFlag(QGraphicsItem::ItemIsMovable, true);
+    //spouseGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    token1->setFlag(QGraphicsItem::ItemIsMovable, false);
+    token2->setFlag(QGraphicsItem::ItemIsMovable, false);
+
 }
 

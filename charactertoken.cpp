@@ -26,8 +26,10 @@ void CharacterToken::paint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
 
     QString label;
-    if (!character->dynasty.isEmpty())
-        label = QString("%1_%2").arg(character->dynasty).arg(character->characterNumber);
+    if (!character->dynasty.isEmpty() && !character->gender.isEmpty())
+        label = QString("%1_%2\n%3\n%4").arg(character->dynasty).arg(character->characterNumber).arg(character->name).arg(character->gender);
+    else if (!character->dynasty.isEmpty() && character->gender.isEmpty())
+        label = QString("%1_%2\n%3\nmale").arg(character->dynasty).arg(character->characterNumber).arg(character->name);
     else
         label = QString("character_%1").arg(character->characterNumber);
 
@@ -49,27 +51,33 @@ void CharacterToken::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             {
                 QMenu menu;
                 QAction *spouseAction = menu.addAction("Set as spouse");
-                QAction *childAction = menu.addAction("Set as child");
+                QAction *setAsParentAction = menu.addAction("Set as parent");
                 QAction *selectedAction = menu.exec(event->screenPos());
 
                 if (selectedAction == spouseAction)
                 {
+                    //qDebug() << "spouse action selected";
                     character->spouseIds.append(otherToken->getCharacterData()->id);
                     otherToken->getCharacterData()->spouseIds.append(character->id);
+
+                    //qDebug() << "emitting spousSet signal for" << character->id + " and" << otherToken->getCharacterData()->id;
+                    emit spousesSet(character->id, otherToken->getCharacterData()->id);
                 }
-                else if (selectedAction == childAction)
+                else if (selectedAction == setAsParentAction)
                 {
-                    character->childrenIds.append(otherToken->getCharacterData()->id);
-                    if (character->gender == "male")
+                    if (otherToken->getCharacterData()->gender == "")
                     {
-                        otherToken->getCharacterData()->fatherId = character->id;
+                        character->fatherId.append((otherToken->getCharacterData()->id));
+                        qDebug() << "father acquired";
                     }
-                    else if (character->gender == "female")
+                    else if (otherToken->getCharacterData()->gender == "female")
                     {
-                        otherToken ->getCharacterData()->motherId = character->id;
+                        character->motherId.append((otherToken->getCharacterData()->id));
+                        qDebug() << "mother acquired";
                     }
+                    emit parentSet(character->id, otherToken->getCharacterData()->id);
                 }
-                if (selectedAction == spouseAction || selectedAction == childAction)
+                if (selectedAction == spouseAction || selectedAction == setAsParentAction)
                 {
                     emit relationshipsChanged();
                 }

@@ -18,6 +18,7 @@ public:
 signals:
     void relationshipsChanged();
     void spousesSet(QString character1Id, QString character2Id);
+    void parentSet(QString character1Id, QString character2Id);
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;

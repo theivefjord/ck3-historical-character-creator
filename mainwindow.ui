@@ -21,6 +21,18 @@
        <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>1069</width>
+         <height>552</height>
+        </size>
+       </property>
        <attribute name="title">
         <string>Character</string>
        </attribute>
@@ -197,7 +209,7 @@
             <enum>Qt::LayoutDirection::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>No Random Traits:</string>
+            <string>Manual Traits</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -2511,7 +2523,7 @@
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
-        <string>Tab 2</string>
+        <string>Family Tree View</string>
        </attribute>
        <widget class="QGraphicsView" name="familyTreeView">
         <property name="geometry">

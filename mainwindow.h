@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "characterdata.h"
+#include "charactertoken.h"
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QTextStream>
@@ -25,12 +26,14 @@ private:
     Ui::MainWindow *ui;
     QString currentFile;
     QMap<QString, QString> fieldValues;
-    QString formatCharacter(CharacterData *character, int characterIndex);
     QGraphicsScene *familyTreeScene;
     QList<CharacterData*> characters;
     QMap<QString, CharacterData*> charactersById;
-    void addCharacterToScene(CharacterData *character);
+    QMap<QString, CharacterToken*> tokensById;
 
+    QString formatCharacter(CharacterData *character, int characterIndex);
+    void addCharacterToScene(CharacterData *character);
+    void exampleCharacterSelection(CharacterData *initialCharacter);
 
 private slots:
     void openFile();
@@ -39,13 +42,14 @@ private slots:
     void closeFile();
     void reloadFile();
     // remember to make a death reason selection input after the death date thingy
-    //void on_nameField_textEdited(const QString &text);
     void on_FieldEdited(const QString &text);
     void on_addCharacter_clicked();
     void on_female_checkBox_stateChanged(int arg1);
     void on_rtraits_checkBox_stateChanged(int arg1);
     void on_traitButton_clicked();
     void updateAllCharacterText();
+    void drawSpouseLine(QString char1Id, QString char2Id);
+    void drawParentLine(QString char1Id, QString char2Id);
 };
 
 #endif // MAINWINDOW_H
