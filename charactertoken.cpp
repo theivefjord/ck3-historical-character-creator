@@ -67,12 +67,12 @@ void CharacterToken::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 {
                     if (otherToken->getCharacterData()->gender == "")
                     {
-                        character->fatherId.append((otherToken->getCharacterData()->id));
+                        character->fatherId = otherToken->getCharacterData()->id;
                         qDebug() << "father acquired";
                     }
                     else if (otherToken->getCharacterData()->gender == "female")
                     {
-                        character->motherId.append((otherToken->getCharacterData()->id));
+                        character->motherId = otherToken->getCharacterData()->id;
                         qDebug() << "mother acquired";
                     }
                     emit parentSet(character->id, otherToken->getCharacterData()->id);
@@ -85,6 +85,14 @@ void CharacterToken::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             }
         }
     }
+}
+
+QVariant CharacterToken::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    if (change == QGraphicsItem::ItemPositionHasChanged) {
+        emit tokenMoved(character->id);
+    }
+    return QGraphicsItem::itemChange(change, value);
 }
 
 void CharacterToken::mousePressEvent(QGraphicsSceneMouseEvent *event)

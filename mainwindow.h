@@ -30,10 +30,12 @@ private:
     QList<CharacterData*> characters;
     QMap<QString, CharacterData*> charactersById;
     QMap<QString, CharacterToken*> tokensById;
+    QMap<QString, QGraphicsPathItem*> parentLines;
 
     QString formatCharacter(CharacterData *character, int characterIndex);
     void addCharacterToScene(CharacterData *character);
     void exampleCharacterSelection(CharacterData *initialCharacter);
+    void updateDnaIfChecked(CharacterData *c);
 
 private slots:
     void openFile();
@@ -50,6 +52,8 @@ private slots:
     void updateAllCharacterText();
     void drawSpouseLine(QString char1Id, QString char2Id);
     void drawParentLine(QString char1Id, QString char2Id);
+    void updateAllLines();
+    void on_dna_checkBox_checkStateChanged(const Qt::CheckState &arg1);
 };
 
 #endif // MAINWINDOW_H

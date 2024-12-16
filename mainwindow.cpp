@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     CharacterData *initialCharacter = new CharacterData();
     exampleCharacterSelection(initialCharacter);
 
+    charactersById[initialCharacter->id] = initialCharacter;
+
     // family tree stuff
     familyTreeScene = new QGraphicsScene(this);
     ui->familyTreeView->setScene(familyTreeScene);
@@ -69,7 +71,7 @@ void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
 
 
         initialCharacter->characterNumber = 1;
-        initialCharacter->id = "character_1";
+        initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
         initialCharacter->name = "Henry";
         initialCharacter->dynasty = "normandy";
         initialCharacter->religion = "catholic";
@@ -227,11 +229,31 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
     if (character->gender == "female")
         formattedText += QString ("    female = yes\n");
 
-    if (!character->fatherId.isEmpty())
-        formattedText += QString ("    father = \%1\n").arg(character->fatherId);
+    // rebuild the dynasty names | because I started using stable ids instead of dynamic ones
+    CharacterData *fatherData = nullptr;
+    CharacterData *motherData = nullptr;
+    auto buildDynastyName = [&](CharacterData *c) {
+        if (!c->dynasty.isEmpty())
+            return c->dynasty + "_" + QString::number(c->characterNumber);
+        else
+            return QString("character_") + QString::number(c->characterNumber);
+    };
 
-    if (!character->motherId.isEmpty())
-        formattedText += QString ("    mother = \%1\n").arg(character->motherId);
+    if (!character->fatherId.isEmpty() && charactersById.contains(character->fatherId)){
+        fatherData = charactersById[character->fatherId];
+        if (fatherData) {
+            QString fatherLabel = buildDynastyName(fatherData);
+            formattedText += QString ("    father = \%1\n").arg(fatherLabel);
+        }
+    }
+
+    if (!character->motherId.isEmpty() && charactersById.contains(character->motherId)){
+        motherData = charactersById[character->motherId];
+        if (motherData) {
+            QString motherLabel = buildDynastyName(motherData);
+            formattedText += QString ("    mother = \%1\n").arg(motherLabel);
+        }
+    }
 
     if (character->disallowRandomTraits == true)
     {
@@ -274,6 +296,12 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
 
     for (const QString &spouseId : character->spouseIds)
     {
+        if (!charactersById.contains(spouseId)) continue;
+
+        CharacterData *spouseData = charactersById[spouseId];
+
+        QString spouseLabel = buildDynastyName(spouseData);
+
         QStringList birthParts = character->birth.split('.');
         int birthyearPlus16 = 0;
         //QString earliestMarryDate = "x.x.x";
@@ -282,7 +310,7 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
             birthyearPlus16 = birthYear + 16;
         }
         QString earliestMarryDate = QString::number(birthyearPlus16) + "." + birthParts[1] + "." + birthParts[2];
-        formattedText += QString("    %2 = { add_spouse = %1 }\n").arg(spouseId).arg(earliestMarryDate);
+        formattedText += QString("    %2 = { add_spouse = %1 }\n").arg(spouseLabel).arg(earliestMarryDate);
     }
 
     if (!character->death.isEmpty())
@@ -390,40 +418,40 @@ void MainWindow::on_addCharacter_clicked()
     if (characters.isEmpty())
         return;
 
-    CharacterData *currentCharacter = characters.last();
+    //CharacterData *currentCharacter = characters.last();
 
     // first get the characterNumber
-    int charIndex = characters.size();
-    currentCharacter->characterNumber = charIndex;
-    currentCharacter->name = ui->nameField->text();
-    currentCharacter->dna = ui->dnaField->text();
-    currentCharacter->fatherId = "";
-    currentCharacter->motherId = "";
-    currentCharacter->religion = ui->religionField->text();
-    currentCharacter->culture = ui->cultureField->text();
-    currentCharacter->dynasty = ui->dynField->text();
-    currentCharacter->birth = ui->bdayField->text();
-    currentCharacter->death = ui->deathdayField->text();
+    //int charIndex = characters.size();
+    //currentCharacter->characterNumber = charIndex;
+    //currentCharacter->name = ui->nameField->text();
+    //currentCharacter->dna = ui->dnaField->text();
+    //currentCharacter->fatherId = "";
+    //currentCharacter->motherId = "";
+   // //currentCharacter->religion = ui->religionField->text();
+    //currentCharacter->culture = ui->cultureField->text();
+    //currentCharacter->dynasty = ui->dynField->text();
+    //currentCharacter->birth = ui->bdayField->text();
+    //currentCharacter->death = ui->deathdayField->text();
 
     // store old id before changing it
-    QString oldId = currentCharacter->id;
+    //QString oldId = currentCharacter->id;
 
     // assign the id for spouse/father/mother etc
-    if (!currentCharacter->dynasty.isEmpty())
-        currentCharacter->id = currentCharacter->dynasty + "_" + QString::number(currentCharacter->characterNumber);
-    else
-        currentCharacter->id = "character_" + QString::number(currentCharacter->characterNumber);
+    //if (!currentCharacter->dynasty.isEmpty())
+    //    currentCharacter->id = currentCharacter->dynasty + "_" + QString::number(currentCharacter->characterNumber);
+    //else
+    //    currentCharacter->id = "character_" + QString::number(currentCharacter->characterNumber);
 
     // Remove the old entry from tokensById
-    if (tokensById.contains(oldId)) {
+    //if (tokensById.contains(oldId)) {
         // remove old id
-        CharacterToken *token = tokensById.take(oldId);
-        tokensById[currentCharacter->id] = token; // Reinsert with new id
-    } else {
-        qDebug() << "if this prints something's wrong with the tokens";
-    }
+    //    CharacterToken *token = tokensById.take(oldId);
+    //    tokensById[currentCharacter->id] = token; // Reinsert with new id
+    //} else {
+    //    qDebug() << "if this prints something's wrong with the tokens";
+    //}
 
-    charactersById[currentCharacter->id] = currentCharacter;
+    //charactersById[currentCharacter->id] = currentCharacter;
 
 
 
@@ -432,6 +460,9 @@ void MainWindow::on_addCharacter_clicked()
     CharacterData *newCharacter = new CharacterData();
     int newCharIndex = characters.size() + 1;
     newCharacter->characterNumber = newCharIndex;
+
+    newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
+
     newCharacter->name = ui->nameField->text();
     newCharacter->dna = ui->dnaField->text();
     newCharacter->fatherId = "";
@@ -443,13 +474,16 @@ void MainWindow::on_addCharacter_clicked()
     newCharacter->death = ui->deathdayField->text();
 
     // assign the id for spouse/father/mother etc
-    if (!newCharacter->dynasty.isEmpty())
-        newCharacter->id = newCharacter->dynasty + "_" + QString::number(newCharacter->characterNumber);
-    else
-        newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
+    //if (!newCharacter->dynasty.isEmpty())
+    //    newCharacter->id = newCharacter->dynasty + "_" + QString::number(newCharacter->characterNumber);
+    //else
+    //    newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
 
     characters.append(newCharacter);
+    charactersById[newCharacter->id] = newCharacter;
     addCharacterToScene(newCharacter);
+
+    updateDnaIfChecked(newCharacter);
     // update the displayed text
     QString updatedText;
     for (int i = 0; i < characters.size(); ++i)
@@ -535,6 +569,7 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     connect(token, &CharacterToken::relationshipsChanged, this, &MainWindow::updateAllCharacterText);
     connect(token, &CharacterToken::spousesSet, this, &MainWindow::drawSpouseLine);
     connect(token, &CharacterToken::parentSet, this, &MainWindow::drawParentLine);
+    connect(token, &CharacterToken::tokenMoved, this, &MainWindow::updateAllLines);
 
     // start at base position
     int x = 0, y = 0;
@@ -555,20 +590,73 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     tokensById[character->id] = token;
 }
 
-void MainWindow::drawParentLine(QString char1Id, QString char2Id)
+void MainWindow::drawParentLine(QString childId, QString parentId)
 {
+    // make sure both exist
+    if (!tokensById.contains(childId) || !tokensById.contains(parentId)){
+        qDebug() << "one of the tokens is missing / drawParentLine";
+        return;
+    }
 
+    CharacterToken *childToken = tokensById[childId];
+    CharacterToken *parentToken = tokensById[parentId];
+
+    // get child's CharacterData and parent(s)
+    CharacterData *childData = charactersById[childId];
+    QString fatherId = childData->fatherId;
+    QString motherId = childData->motherId;
+
+    // decide where line starts from
+    QPointF startPoint;
+    if (!fatherId.isEmpty() && !motherId.isEmpty()){
+        // two parents know check if spouse
+        if (!tokensById.contains(fatherId) || !tokensById.contains(motherId))
+            return;
+
+        CharacterToken *fatherToken = tokensById[fatherId];
+        CharacterToken *motherToken = tokensById[motherId];
+
+        QPointF fatherPos = fatherToken->scenePos();
+        QPointF motherPos = motherToken->scenePos();
+        startPoint = QPointF((fatherPos.x() + motherPos.x())/2 + 50, (fatherPos.y() + motherPos.y())/2 + 25);
+    }
+    else {
+        // only one parent known
+        QPointF parentPos = parentToken->scenePos();
+        QRectF parentRect = parentToken->boundingRect();
+        startPoint = parentPos + QPointF(parentRect.width()/2, parentRect.height());
+    }
+
+    // end point is childs top center
+    QRectF childRect = childToken->boundingRect();
+    QPointF endPoint = childToken->scenePos() + QPointF(childRect.width()/2, 0);
+
+    // create a path
+    QPainterPath path(startPoint);
+    qreal midY = (startPoint.y() + endPoint.y()) / 2;
+    path.lineTo(startPoint.x(), midY); // down from parent midpoint
+    path.lineTo(endPoint.x(), midY);   // horizontal line over child's x
+    path.lineTo(endPoint);            // down to child's top
+
+    // if a line already exists for this child (might be redrawing)
+    if (parentLines.contains(childId)) {
+        QGraphicsPathItem *lineItem = parentLines[childId];
+        lineItem->setPath(path);
+    } else {
+        QGraphicsPathItem *lineItem = familyTreeScene->addPath(path, QPen(Qt::white, 3));
+        parentLines[childId] = lineItem;
+    }
 }
 
 void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 {
     //qDebug() << "drawSpouseLine called with:" << char1Id << char2Id;
 
-    //if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
-    //{
+    if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
+    {
     //    qDebug() << "one of the tokens is not in tokensbyid.";
-    //    return;
-    //}
+        return;
+    }
 
     CharacterToken *token1 = tokensById[char1Id];
     CharacterToken *token2 = tokensById[char2Id];
@@ -592,6 +680,61 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
     //spouseGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
     token1->setFlag(QGraphicsItem::ItemIsMovable, false);
     token2->setFlag(QGraphicsItem::ItemIsMovable, false);
-
 }
 
+void MainWindow::updateAllLines()
+{
+    // for each child that has a parent line, recalculate the the path
+
+    for (auto it = parentLines.begin(); it != parentLines.end(); ++it){
+        QString childId = it.key();
+        CharacterData *childData = charactersById[childId];
+        if (!childData) continue;
+        // get parentId(s)
+        QString fatherId = childData->fatherId;
+        QString motherId = childData->motherId;
+
+        // call drawparentline again if father or mother exists
+        if (!fatherId.isEmpty() && motherId.isEmpty()){
+            drawParentLine(childId, fatherId);
+        } else if (!motherId.isEmpty() && fatherId.isEmpty()){
+            drawParentLine(childId, motherId);
+        } else if (!fatherId.isEmpty() && !motherId.isEmpty()) {
+            drawParentLine(childId, fatherId);
+        }
+    }
+}
+
+
+void MainWindow::on_dna_checkBox_checkStateChanged(const Qt::CheckState &state)
+{
+    if (characters.isEmpty()) return;
+
+    CharacterData *activeCharacter = characters.last();
+
+    ui->dnaField->setReadOnly(state == Qt::Checked);
+
+    updateDnaIfChecked(activeCharacter);
+
+    updateAllCharacterText();
+}
+
+void MainWindow::updateDnaIfChecked(CharacterData *c)
+{
+    if (!c) return;
+
+    if (ui->dna_checkBox->isChecked()) {
+        int charIndex = c->characterNumber;
+        QString newDna;
+        if (!c->dynasty.isEmpty()) {
+            newDna = c->dynasty + "_" + QString::number(charIndex);
+        } else {
+            newDna = "character_" + QString::number(charIndex);
+        }
+
+        c->dna = newDna;
+        ui->dnaField->setText(newDna);
+    } else {
+        c->dna = ui->dnaField->text();
+    }
+}
