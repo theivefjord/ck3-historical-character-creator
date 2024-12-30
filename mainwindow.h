@@ -36,6 +36,7 @@ private:
     void addCharacterToScene(CharacterData *character);
     void exampleCharacterSelection(CharacterData *initialCharacter);
     void updateDnaIfChecked(CharacterData *c);
+    void initializeCharacterSheet();
 
 private slots:
     void openFile();
@@ -54,6 +55,12 @@ private slots:
     void drawParentLine(QString char1Id, QString char2Id);
     void updateAllLines();
     void on_dna_checkBox_checkStateChanged(const Qt::CheckState &arg1);
+    void on_AGOT_checkBox_checkStateChanged(const Qt::CheckState &arg1);
+    void on_actionChange_character_index_triggered();
+    void on_actionToggle_DNA_field_toggled(bool arg1);
+    void on_actionToggle_Death_date_field_toggled(bool arg1);
+    void on_actionReload_Text_not_file_triggered();
+    void on_openFileEdit_modificationChanged(bool arg1);
 };
 
 #endif // MAINWINDOW_H

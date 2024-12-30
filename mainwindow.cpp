@@ -6,6 +6,7 @@
 #include "QScrollBar"
 #include "characterdata.h"
 #include "QValidator"
+#include <QInputDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,6 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
     // datevalidator stuff
     QRegularExpression re("^\\d+\\.(1[0-2]|[1-9])\\.(30|[12]\\d|[1-9])$");
     QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
+    srand(static_cast<unsigned int>(time(0)));
 
     connect(ui->nameField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->dnaField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
@@ -33,15 +35,17 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     ui->deathdayField->setValidator(dateValidator);
     // create example character
-    CharacterData *initialCharacter = new CharacterData();
-    exampleCharacterSelection(initialCharacter);
 
-    charactersById[initialCharacter->id] = initialCharacter;
+
+
+
 
     // family tree stuff
     familyTreeScene = new QGraphicsScene(this);
     ui->familyTreeView->setScene(familyTreeScene);
-    addCharacterToScene(initialCharacter);
+
+    initializeCharacterSheet();
+
 
     // trait buttons
     QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
@@ -54,20 +58,38 @@ MainWindow::MainWindow(QWidget *parent)
     sp_retain.setRetainSizeWhenHidden(true);
     ui->traitTabs->setSizePolicy(sp_retain);
     ui->traitTabs->setVisible(false);
+    // setup agot traits
+    ui->inquisitive->setVisible(false);
+    ui->authoritative->setVisible(false);
+    ui->rude->setVisible(false);
+}
+
+void MainWindow::initializeCharacterSheet()
+{
+    characters.clear();
+    charactersById.clear();
+    tokensById.clear();
+    parentLines.clear();
+    familyTreeScene->clear();
+
+    CharacterData *initialCharacter = new CharacterData();
+    exampleCharacterSelection(initialCharacter);
+    charactersById[initialCharacter->id] = initialCharacter;
+    addCharacterToScene(initialCharacter);
+    updateAllCharacterText();
 }
 
 void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
 {
     int randNum = rand() % 5;
-    if (randNum == 1 || 2 || 3 || 4){
-        // Set initial text in line edits
+    if (randNum == 1){
         ui->nameField->setText("Henry");
         ui->dynField->setText("normandy");
         ui->religionField->setText("catholic");
         ui->cultureField->setText("english");
-        ui->dnaField->setText("normandy_1");
+        if (!ui->actionToggle_DNA_field->isChecked()) ui->dnaField->setText("normandy_1");
         ui->bdayField->setText("1068.8.20");
-        ui->deathdayField->setText("1135.12.1");
+        if (!ui->actionToggle_Death_date_field->isChecked()) ui->deathdayField->setText("1135.12.1");
 
 
         initialCharacter->characterNumber = 1;
@@ -76,16 +98,101 @@ void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
         initialCharacter->dynasty = "normandy";
         initialCharacter->religion = "catholic";
         initialCharacter->culture = "english";
-        initialCharacter->dna = "normandy_1";
+        if (!ui->actionToggle_DNA_field->isChecked()) initialCharacter->dna = "normandy_1";
         initialCharacter->birth = "1068.8.20";
-        initialCharacter->death = "1135.12.1";
+        if (!ui->actionToggle_Death_date_field->isChecked()) initialCharacter->death = "1135.12.1";
         characters.append(initialCharacter);
-        // Update text output
-        QString updatedText;
-        for (int i = 0; i < characters.size(); ++i) {
-            updatedText += formatCharacter(characters[i], i + 1);
-        }
-        ui->openFileEdit_newchars->setPlainText(updatedText);
+        updateAllCharacterText();
+    }
+    else if (randNum == 2){
+        ui->nameField->setText("Mahaut");
+        ui->dynField->setText("artois");
+        ui->religionField->setText("catholic");
+        ui->cultureField->setText("french");
+        if (!ui->actionToggle_DNA_field->isChecked()) ui->dnaField->setText("artois_1");
+        ui->bdayField->setText("1268.3.20");
+        if (!ui->actionToggle_Death_date_field->isChecked()) ui->deathdayField->setText("1329.11.27");
+        ui->female_checkBox->setChecked(true);
+
+
+        initialCharacter->characterNumber = 1;
+        initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
+        initialCharacter->name = "Mahaut";
+        initialCharacter->dynasty = "artois";
+        initialCharacter->religion = "catholic";
+        initialCharacter->culture = "french";
+        initialCharacter->gender = "female";
+        if (!ui->actionToggle_DNA_field->isChecked()) initialCharacter->dna = "artois_1";
+        initialCharacter->birth = "1268.3.20";
+        if (!ui->actionToggle_Death_date_field->isChecked()) initialCharacter->death = "1329.11.27";
+        characters.append(initialCharacter);
+        updateAllCharacterText();
+    }
+    else if (randNum == 3){
+        ui->nameField->setText("Philippe");
+        ui->dynField->setText("capet");
+        ui->religionField->setText("catholic");
+        ui->cultureField->setText("french");
+        if (!ui->actionToggle_DNA_field->isChecked()) ui->dnaField->setText("capet_1");
+        ui->bdayField->setText("1268.4.4");
+        if (!ui->actionToggle_Death_date_field->isChecked()) ui->deathdayField->setText("1314.11.29");
+
+
+        initialCharacter->characterNumber = 1;
+        initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
+        initialCharacter->name = "Philippe";
+        initialCharacter->dynasty = "capet";
+        initialCharacter->religion = "catholic";
+        initialCharacter->culture = "french";
+        if (!ui->actionToggle_DNA_field->isChecked()) initialCharacter->dna = "capet_1";
+        initialCharacter->birth = "1268.4.4";
+        if (!ui->actionToggle_Death_date_field->isChecked()) initialCharacter->death = "1314.11.29";
+        characters.append(initialCharacter);
+        updateAllCharacterText();
+    }
+    else if (randNum == 4){
+        ui->nameField->setText("Dante");
+        ui->dynField->setText("alighieri");
+        ui->religionField->setText("catholic");
+        ui->cultureField->setText("italian");
+        if (!ui->actionToggle_DNA_field->isChecked()) ui->dnaField->setText("alighieri_1");
+        ui->bdayField->setText("1265.3.17");
+        if (!ui->actionToggle_Death_date_field->isChecked()) ui->deathdayField->setText("1321.9.14");
+
+
+        initialCharacter->characterNumber = 1;
+        initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
+        initialCharacter->name = "Dante";
+        initialCharacter->dynasty = "alighieri";
+        initialCharacter->religion = "catholic";
+        initialCharacter->culture = "italian";
+        if (!ui->actionToggle_DNA_field->isChecked()) initialCharacter->dna = "alighieri_1";
+        initialCharacter->birth = "1265.3.17";
+        if (!ui->actionToggle_Death_date_field->isChecked()) initialCharacter->death = "1321.9.14";
+        characters.append(initialCharacter);
+        updateAllCharacterText();
+    }
+    else if (randNum == 0){
+        ui->nameField->setText("Gustav");
+        ui->dynField->setText("vasa");
+        ui->religionField->setText("protestant");
+        ui->cultureField->setText("swedish");
+        if (!ui->actionToggle_DNA_field->isChecked()) ui->dnaField->setText("vasa_1");
+        ui->bdayField->setText("1594.12.9");
+        if (!ui->actionToggle_Death_date_field->isChecked()) ui->deathdayField->setText("1632.11.6");
+
+
+        initialCharacter->characterNumber = 1;
+        initialCharacter->id = "character_" + QString::number(initialCharacter->characterNumber);
+        initialCharacter->name = "Gustav";
+        initialCharacter->dynasty = "vasa";
+        initialCharacter->religion = "protestant";
+        initialCharacter->culture = "swedish";
+        if (!ui->actionToggle_DNA_field->isChecked()) initialCharacter->dna = "vasa_1";
+        initialCharacter->birth = "1594.12.9";
+        if (!ui->actionToggle_Death_date_field->isChecked()) initialCharacter->death = "1632.11.6";
+        characters.append(initialCharacter);
+        updateAllCharacterText();
     }
 }
 
@@ -116,6 +223,8 @@ void MainWindow::saveFileAs()
             QTextStream out(&file);
             out << ui->openFileEdit->toPlainText();
             file.close();
+            ui->openFileEdit->document()->setModified(false);
+            setWindowTitle(currentFile);
         }
     }
 }
@@ -133,6 +242,8 @@ void MainWindow::saveFile()
             QTextStream out(&file);
             out << ui->openFileEdit->toPlainText();
             file.close();
+            ui->openFileEdit->document()->setModified(false);
+            setWindowTitle(currentFile);
         }
     }
 }
@@ -191,8 +302,8 @@ void MainWindow::reloadFile()
             ui->openFileEdit->setPlainText(in.readAll());
             file.close();
             ui->openFileEdit->document()->setModified(false);
+            setWindowTitle(currentFile);
             statusBar()->showMessage(tr("File reloaded successfully"), 3000);
-            // make the program blink or something here for feedback otherwise you'll feel unsure
         }
     }
 }
@@ -216,18 +327,18 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
     }
 
     if (!character->name.isEmpty())
-        formattedText += QString ("    name = \%1\n").arg(character->name);
+        formattedText += QString ("\tname = \%1\n").arg(character->name);
     if (!character->dna.isEmpty())
-        formattedText += QString ("    dna = \%1\n").arg(character->dna);
+        formattedText += QString ("\tdna = \%1\n").arg(character->dna);
     if (!character->dynasty.isEmpty())
-        formattedText += QString("    dynasty = \%1\n").arg(character->dynasty);
+        formattedText += QString("\tdynasty = dynn_\%1\n").arg(character->dynasty);
     if (!character->culture.isEmpty())
-        formattedText += QString ("    culture = \%1\n").arg(character->culture);
+        formattedText += QString ("\tculture = \%1\n").arg(character->culture);
     if (!character->religion.isEmpty())
-        formattedText += QString ("    religion = \%1\n").arg(character->religion);
+        formattedText += QString ("\treligion = \%1\n").arg(character->religion);
 
     if (character->gender == "female")
-        formattedText += QString ("    female = yes\n");
+        formattedText += QString ("\tfemale = yes\n");
 
     // rebuild the dynasty names | because I started using stable ids instead of dynamic ones
     CharacterData *fatherData = nullptr;
@@ -243,7 +354,7 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
         fatherData = charactersById[character->fatherId];
         if (fatherData) {
             QString fatherLabel = buildDynastyName(fatherData);
-            formattedText += QString ("    father = \%1\n").arg(fatherLabel);
+            formattedText += QString ("\tfather = \%1\n").arg(fatherLabel);
         }
     }
 
@@ -251,13 +362,13 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
         motherData = charactersById[character->motherId];
         if (motherData) {
             QString motherLabel = buildDynastyName(motherData);
-            formattedText += QString ("    mother = \%1\n").arg(motherLabel);
+            formattedText += QString ("\tmother = \%1\n").arg(motherLabel);
         }
     }
 
     if (character->disallowRandomTraits == true)
     {
-        formattedText += QString("    disallow_random_traits = yes\n");
+        formattedText += QString("\tdisallow_random_traits = yes\n");
     }
 
     for (const QString &trait : character->traits)
@@ -265,34 +376,39 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
         if (trait.contains("i_e_")){
             QStringList traitParts = trait.split('_');
             QString updatedTrait = "education_intrigue_" + traitParts[2];
-            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
         }
         else if (trait.contains("d_e_")){
             QStringList traitParts = trait.split('_');
             QString updatedTrait = "education_diplomacy_" + traitParts[2];
-            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
         }
         else if (trait.contains("s_e_")){
             QStringList traitParts = trait.split('_');
             QString updatedTrait = "education_stewardship_" + traitParts[2];
-            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
         }
         else if (trait.contains("m_e_")){
             QStringList traitParts = trait.split('_');
             QString updatedTrait = "education_martial_" + traitParts[2];
-            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
         }
         else if (trait.contains("l_e_")){
             QStringList traitParts = trait.split('_');
             QString updatedTrait = "education_learning_" + traitParts[2];
-            formattedText += QString("    trait = %1\n").arg(updatedTrait);
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
+        }
+        else if (trait.contains("e_m_p_")) {
+            QStringList traitParts = trait.split('_');
+            QString updatedTrait = "education_martial_prowess_" + traitParts[3];
+            formattedText += QString("\ttrait = %1\n").arg(updatedTrait);
         }
         else
-            formattedText += QString("    trait = %1\n").arg(trait);
+            formattedText += QString("\ttrait = %1\n").arg(trait);
     }
 
     if (!character->birth.isEmpty())
-        formattedText += QString ("    %1 = { birth = yes }\n").arg(character->birth);
+        formattedText += QString ("\t%1 = { birth = yes }\n").arg(character->birth);
 
     for (const QString &spouseId : character->spouseIds)
     {
@@ -310,11 +426,11 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
             birthyearPlus16 = birthYear + 16;
         }
         QString earliestMarryDate = QString::number(birthyearPlus16) + "." + birthParts[1] + "." + birthParts[2];
-        formattedText += QString("    %2 = { add_spouse = %1 }\n").arg(spouseLabel).arg(earliestMarryDate);
+        formattedText += QString("\t%2 = { add_spouse = %1 }\n").arg(spouseLabel).arg(earliestMarryDate);
     }
 
     if (!character->death.isEmpty())
-        formattedText += QString ("    %1 = { death = yes }\n").arg(character->death);
+        formattedText += QString ("\t%1 = { death = yes }\n").arg(character->death);
 
 
     formattedText += "}\n\n";
@@ -366,16 +482,11 @@ void MainWindow::on_FieldEdited(const QString &text)
     else if (key == "death")
         activeChar->death = text;
 
-    QScrollBar *scrollBar = ui->openFileEdit_newchars->verticalScrollBar();
-    int scrollPosition = scrollBar->value();
+    // if dna checkbox is checked updated DNA
+    updateDnaIfChecked(activeChar);
 
-    QString updatedText;
-    for (int i = 0; i < characters.size(); ++i)
-    {
-        updatedText += formatCharacter(characters[i], i+1);
-    }
-    ui->openFileEdit_newchars->setPlainText(updatedText);
-    scrollBar->setValue(scrollPosition);
+    updateAllCharacterText();
+    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
 
 void MainWindow::on_traitButton_clicked()
@@ -404,13 +515,9 @@ void MainWindow::on_traitButton_clicked()
 
     activeCharacter->traits = traits;
 
-    QString updatedText;
-    for (int i = 0; i < characters.size(); ++i)
-    {
-        updatedText += formatCharacter(characters[i], i + 1);
-    }
-
-    ui->openFileEdit_newchars->setPlainText(updatedText);
+    updateAllCharacterText();
+    ui->openFileEdit_newchars->ensureCursorVisible();
+    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
 
 void MainWindow::on_addCharacter_clicked()
@@ -418,50 +525,14 @@ void MainWindow::on_addCharacter_clicked()
     if (characters.isEmpty())
         return;
 
-    //CharacterData *currentCharacter = characters.last();
-
-    // first get the characterNumber
-    //int charIndex = characters.size();
-    //currentCharacter->characterNumber = charIndex;
-    //currentCharacter->name = ui->nameField->text();
-    //currentCharacter->dna = ui->dnaField->text();
-    //currentCharacter->fatherId = "";
-    //currentCharacter->motherId = "";
-   // //currentCharacter->religion = ui->religionField->text();
-    //currentCharacter->culture = ui->cultureField->text();
-    //currentCharacter->dynasty = ui->dynField->text();
-    //currentCharacter->birth = ui->bdayField->text();
-    //currentCharacter->death = ui->deathdayField->text();
-
-    // store old id before changing it
-    //QString oldId = currentCharacter->id;
-
-    // assign the id for spouse/father/mother etc
-    //if (!currentCharacter->dynasty.isEmpty())
-    //    currentCharacter->id = currentCharacter->dynasty + "_" + QString::number(currentCharacter->characterNumber);
-    //else
-    //    currentCharacter->id = "character_" + QString::number(currentCharacter->characterNumber);
-
-    // Remove the old entry from tokensById
-    //if (tokensById.contains(oldId)) {
-        // remove old id
-    //    CharacterToken *token = tokensById.take(oldId);
-    //    tokensById[currentCharacter->id] = token; // Reinsert with new id
-    //} else {
-    //    qDebug() << "if this prints something's wrong with the tokens";
-    //}
-
-    //charactersById[currentCharacter->id] = currentCharacter;
-
-
-
-
-
     CharacterData *newCharacter = new CharacterData();
-    int newCharIndex = characters.size() + 1;
-    newCharacter->characterNumber = newCharIndex;
-
-    newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
+    int maxNumber = 0;
+    for (CharacterData *c : characters) {
+        if (c->characterNumber > maxNumber) {
+            maxNumber = c->characterNumber;
+        }
+    }
+    newCharacter->characterNumber = maxNumber + 1;
 
     newCharacter->name = ui->nameField->text();
     newCharacter->dna = ui->dnaField->text();
@@ -473,27 +544,25 @@ void MainWindow::on_addCharacter_clicked()
     newCharacter->birth = ui->bdayField->text();
     newCharacter->death = ui->deathdayField->text();
 
-    // assign the id for spouse/father/mother etc
-    //if (!newCharacter->dynasty.isEmpty())
-    //    newCharacter->id = newCharacter->dynasty + "_" + QString::number(newCharacter->characterNumber);
-    //else
-    //    newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
+    if (!newCharacter->dynasty.isEmpty())
+        newCharacter->id = newCharacter->dynasty + "_" + QString::number(newCharacter->characterNumber);
+    else
+        newCharacter->id = "character_" + QString::number(newCharacter->characterNumber);
 
     characters.append(newCharacter);
     charactersById[newCharacter->id] = newCharacter;
     addCharacterToScene(newCharacter);
-
     updateDnaIfChecked(newCharacter);
-    // update the displayed text
-    QString updatedText;
-    for (int i = 0; i < characters.size(); ++i)
-    {
-        updatedText += formatCharacter(characters[i], i + 1);
-    }
-    ui->openFileEdit_newchars->setPlainText(updatedText);
+    updateAllCharacterText();
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
     ui->female_checkBox->setChecked(false);
     ui->rtraits_checkBox->setChecked(false);
+    // uncheck trait buttons
+    QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
+    for (QPushButton *button : traitButtons)
+    {
+        if (button->isChecked()) button->setChecked(false);
+    }
 }
 
 void MainWindow::on_female_checkBox_stateChanged(int state)
@@ -512,14 +581,7 @@ void MainWindow::on_female_checkBox_stateChanged(int state)
         activeCharacter->gender = "";
     }
 
-    QString updatedText;
-
-    for (int i = 0; i < characters.size(); ++i)
-    {
-        updatedText += formatCharacter(characters[i], i + 1);
-    }
-
-    ui->openFileEdit_newchars->setPlainText(updatedText);
+    updateAllCharacterText();
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
 
@@ -542,14 +604,7 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
         ui->traitTabs->setVisible(false);
     }
 
-    QString updatedText;
-
-    for (int i = 0; i < characters.size(); ++i)
-    {
-        updatedText += formatCharacter(characters[i], i + 1);
-    }
-
-    ui->openFileEdit_newchars->setPlainText(updatedText);
+    updateAllCharacterText();
     ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
 void MainWindow::updateAllCharacterText()
@@ -737,4 +792,108 @@ void MainWindow::updateDnaIfChecked(CharacterData *c)
     } else {
         c->dna = ui->dnaField->text();
     }
+    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
 }
+
+void MainWindow::on_AGOT_checkBox_checkStateChanged(const Qt::CheckState &state)
+{
+    if (state == Qt::Checked){
+        ui->inquisitive->setVisible(true);
+        ui->authoritative->setVisible(true);
+        ui->rude->setVisible(true);
+    }
+    else {
+        ui->inquisitive->setVisible(false);
+        ui->authoritative->setVisible(false);
+        ui->rude->setVisible(false);
+    }
+}
+
+
+void MainWindow::on_actionChange_character_index_triggered()
+{
+    if (characters.isEmpty()) {
+        QMessageBox::warning(this, "No Active Character", "There is no active character to change the index of.");
+        return;
+    }
+
+    CharacterData *activeCharacter = characters.last();
+
+    // prompt for new index
+    bool ok;
+    int newNumber = QInputDialog::getInt(this, "Change Character Index", "Enter the new starting character number:", activeCharacter->characterNumber, 1, 100000, 1, &ok);
+
+    if (!ok)
+        return;
+
+    activeCharacter->characterNumber = newNumber;
+
+    updateDnaIfChecked(activeCharacter);
+
+    // update ui line edits
+    ui->nameField->setText(activeCharacter->name);
+    ui->dnaField->setText(activeCharacter->dna);
+    ui->religionField->setText(activeCharacter->religion);
+    ui->cultureField->setText(activeCharacter->culture);
+    ui->dynField->setText(activeCharacter->dynasty);
+    ui->bdayField->setText(activeCharacter->birth);
+    ui->deathdayField->setText(activeCharacter->death);
+
+    ui->female_checkBox->setChecked(activeCharacter->gender == "female");
+    ui->rtraits_checkBox->setChecked(activeCharacter->disallowRandomTraits);
+
+    updateAllCharacterText();
+    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+}
+
+
+void MainWindow::on_actionToggle_DNA_field_toggled(bool state)
+{
+    if (characters.isEmpty()) return;
+
+    CharacterData *activeCharacter = characters.last();
+
+    if (state == true){
+        ui->dnaField->clear();
+        activeCharacter->dna.clear();
+        updateAllCharacterText();
+        ui->dnaField->setVisible(false);
+        ui->dna_checkBox->setChecked(false);
+        ui->dna_checkBox->setVisible(false);
+    } else {
+        ui->dnaField->setVisible(true);
+        ui->dna_checkBox->setVisible(true);
+    }
+}
+
+
+void MainWindow::on_actionToggle_Death_date_field_toggled(bool state)
+{
+    if (characters.isEmpty()) return;
+
+    CharacterData *activeCharacter = characters.last();
+
+    if (state == true){
+        ui->deathday->setVisible(false);
+        ui->deathdayField->clear();
+        activeCharacter->death.clear();
+        updateAllCharacterText();
+        ui->deathdayField->setVisible(false);
+    } else {
+        ui->deathday->setVisible(true);
+        ui->deathdayField->setVisible(true);
+    }
+}
+
+
+void MainWindow::on_actionReload_Text_not_file_triggered()
+{
+    initializeCharacterSheet();
+}
+
+
+void MainWindow::on_openFileEdit_modificationChanged(bool changed)
+{
+    if (changed == true) setWindowTitle("*" + currentFile);
+}
+

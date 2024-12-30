@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/new/prefix1">
+    <qresource prefix="/traits/education traits">
         <file>assets/education_stewardship_1.png</file>
         <file>assets/education_diplomacy_1.png</file>
         <file>assets/education_diplomacy_2.png</file>
@@ -30,6 +30,11 @@
         <file>assets/bossy.png</file>
         <file>assets/rowdy.png</file>
         <file>assets/pensive.png</file>
+        <file>assets/education_martial_prowess_5.png</file>
+        <file>assets/education_martial_prowess_3.png</file>
+        <file>assets/education_martial_prowess_4.png</file>
+        <file>assets/education_martial_prowess_2.png</file>
+        <file>assets/education_martial_prowess_1.png</file>
     </qresource>
     <qresource prefix="/traits/personality traits">
         <file>assets/content.png</file>
@@ -68,5 +73,48 @@
         <file>assets/stubborn.png</file>
         <file>assets/arrogant.png</file>
         <file>assets/greedy.png</file>
+        <file>assets/rude.png</file>
+        <file>assets/authoritative.png</file>
+        <file>assets/inquisitive.png</file>
+    </qresource>
+    <qresource prefix="/traits/congenital traits">
+        <file>assets/physique_bad_2.png</file>
+        <file>assets/physique_bad_1.png</file>
+        <file>assets/physique_good_1.png</file>
+        <file>assets/intellect_good_3.png</file>
+        <file>assets/physique_bad_3.png</file>
+        <file>assets/physique_good_2.png</file>
+        <file>assets/intellect_bad_2.png</file>
+        <file>assets/intellect_good_1.png</file>
+        <file>assets/intellect_good_2.png</file>
+        <file>assets/beauty_good_3.png</file>
+        <file>assets/intellect_bad_1.png</file>
+        <file>assets/intellect_bad_3.png</file>
+        <file>assets/beauty_bad_3.png</file>
+        <file>assets/beauty_good_1.png</file>
+        <file>assets/beauty_good_2.png</file>
+        <file>assets/beauty_bad_1.png</file>
+        <file>assets/beauty_bad_2.png</file>
+        <file>assets/bleeder.png</file>
+        <file>assets/infertile.png</file>
+        <file>assets/spindly.png</file>
+        <file>assets/wheezing.png</file>
+        <file>assets/clubfooted.png</file>
+        <file>assets/dwarf.png</file>
+        <file>assets/hunchbacked.png</file>
+        <file>assets/giant.png</file>
+        <file>assets/pure_blooded.png</file>
+        <file>assets/scaly.png</file>
+        <file>assets/albino.png</file>
+        <file>assets/lisping.png</file>
+        <file>assets/stuttering.png</file>
+        <file>assets/fecund.png</file>
+        <file>assets/lunatic_genetic.png</file>
+        <file>assets/possessed_genetic.png</file>
+        <file>assets/depressed_genetic.png</file>
+        <file>assets/physique_good_3.png</file>
+    </qresource>
+    <qresource prefix="/icons">
+        <file>iconthingy/favicon.ico</file>
     </qresource>
 </RCC>
