@@ -58,21 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->inquisitive->setVisible(false);
     ui->authoritative->setVisible(false);
     ui->rude->setVisible(false);
-}
-
-void MainWindow::on_removeSpousesRequested(QString characterId)
-{
-    if (!charactersById.contains(characterId)) return;
-    CharacterData *cd = charactersById[characterId];
-
-    // remove all spouse connections
-    for (const QString &spouseId : cd->spouseIds) {
-        if (charactersById.contains(spouseId)) {
-            CharacterData *spouse = charactersById[spouseId];
-            spouse->spouseIds.removeAll(characterId);
-        }
-    }
-    cd->spouseIds.clear();
+    // set drag mode in 2nd tab
+    ui->familyTreeView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
 void MainWindow::initializeCharacterSheet()
@@ -81,6 +68,7 @@ void MainWindow::initializeCharacterSheet()
     charactersById.clear();
     tokensById.clear();
     parentLines.clear();
+    spouseLines.clear();
     familyTreeScene->clear();
 
     CharacterData *initialCharacter = new CharacterData();
@@ -497,7 +485,7 @@ void MainWindow::on_FieldEdited(const QString &text)
     updateDnaIfChecked(activeChar);
 
     updateAllCharacterText();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 void MainWindow::on_traitButton_clicked()
@@ -527,8 +515,8 @@ void MainWindow::on_traitButton_clicked()
     activeCharacter->traits = traits;
 
     updateAllCharacterText();
-    ui->openFileEdit_newchars->ensureCursorVisible();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->ensureCursorVisible();
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 void MainWindow::on_addCharacter_clicked()
@@ -565,7 +553,7 @@ void MainWindow::on_addCharacter_clicked()
     addCharacterToScene(newCharacter);
     updateDnaIfChecked(newCharacter);
     updateAllCharacterText();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
     ui->female_checkBox->setChecked(false);
     ui->rtraits_checkBox->setChecked(false);
     // uncheck trait buttons
@@ -593,7 +581,7 @@ void MainWindow::on_female_checkBox_stateChanged(int state)
     }
 
     updateAllCharacterText();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 
@@ -616,7 +604,7 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
     }
 
     updateAllCharacterText();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 void MainWindow::updateAllCharacterText()
 {
@@ -625,7 +613,7 @@ void MainWindow::updateAllCharacterText()
     {
         updatedText += formatCharacter(characters[i], characters[i]->characterNumber);
     }
-    ui->openFileEdit_newchars->setPlainText(updatedText);
+    ui->characterSheet->setPlainText(updatedText);
 }
 
 void MainWindow::addCharacterToScene(CharacterData *character)
@@ -637,6 +625,7 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     connect(token, &CharacterToken::parentSet, this, &MainWindow::drawParentLine);
     connect(token, &CharacterToken::tokenMoved, this, &MainWindow::updateAllLines);
     connect(token, &CharacterToken::removeSpousesRequested, this, &MainWindow::on_removeSpousesRequested);
+    connect(token, &CharacterToken::removeParentsRequested, this, &MainWindow::on_removeParentsRequested);
 
     // start at base position
     int x = 0, y = 0;
@@ -684,8 +673,28 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
         CharacterToken *motherToken = tokensById[motherId];
 
         QPointF fatherPos = fatherToken->scenePos();
+        QRectF fatherRect = fatherToken->boundingRect();
+        QPointF fatherBottom(
+            fatherPos.x() + fatherRect.width() / 2,
+            fatherPos.y() + fatherRect.height()
+            );
+
         QPointF motherPos = motherToken->scenePos();
-        startPoint = QPointF((fatherPos.x() + motherPos.x())/2 + 50, (fatherPos.y() + motherPos.y())/2 + 25);
+        QRectF motherRect = motherToken->boundingRect();
+        QPointF motherBottom(
+            motherPos.x() + motherRect.width() / 2,
+            motherPos.y() + motherRect.height()
+            );
+
+        // same offset as spouseLine
+        qreal offset = 15;
+
+        qreal lowestY = qMax(fatherBottom.y(), motherBottom.y());
+        qreal sharedY = lowestY + offset;
+
+        qreal midX = (fatherBottom.x() + motherBottom.x()) / 2;
+
+        startPoint = QPointF(midX, sharedY);
     }
     else {
         // only one parent known
@@ -719,40 +728,40 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 {
     if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
     {
+        qDebug() << "one of the tokens is missing / drawSpouseLine";
         return;
     }
 
     CharacterToken *token1 = tokensById[char1Id];
     CharacterToken *token2 = tokensById[char2Id];
 
-    // get positions
-    QPointF pos2 = token2->scenePos();
-    //token1->setPos(pos2.x() - 120, pos2.y()); // align tokens for line
     QPointF pos1 = token1->scenePos();
+    QRectF rect1 = token1->boundingRect();
+    QPointF bottomCenter1(
+        pos1.x() + rect1.width()/2,
+        pos1.y() + rect1.height()
+        );
 
-    //QPointF startPoint;
-    QRectF spouse1Rect = token1->boundingRect();
-    //QPointF pos1 = token1->scenePos();
-    QPointF startPoint = pos1 + QPointF(spouse1Rect.width(), spouse1Rect.height()/2);
-    //QPointF pos2 = token2->scenePos();
-    QRectF spouse2Rect = token2->boundingRect();
-    QPointF endPoint = pos2 + QPointF(spouse2Rect.width()*0, spouse2Rect.height()/2);
+    QPointF pos2 = token2->scenePos();
+    QRectF rect2 = token2->boundingRect();
+    QPointF bottomCenter2(
+        pos2.x() + rect2.width()/2,
+        pos2.y() + rect2.height()
+        );
 
-    qreal startX = startPoint.x();
-    qreal startY = startPoint.y();
-    qreal endX = endPoint.x();
-    qreal endY = endPoint.y();
+    qreal offset = 15;
+    qreal lowestBottom = qMax(bottomCenter1.y(), bottomCenter2.y());
+    qreal sharedY = lowestBottom + offset;
 
-    qreal midX = (startX + endX) / 2;
+    // fuck these fucking lines bro and fuck math 💀
+    QPainterPath path(bottomCenter1);
 
-    // create path
-    QPainterPath path(startPoint);
-    // fuck this math shit i have no idea but it works 💀
-    path.lineTo(midX, startY);
+    path.lineTo(bottomCenter1.x(), sharedY);
 
-    path.lineTo(midX, endY);
+    path.lineTo(bottomCenter2.x(), sharedY);
 
-    path.lineTo(endX, endY);
+    path.lineTo(bottomCenter2);
+
 
     if (spouseLines.contains(char1Id)) {
         QGraphicsPathItem *lineItem = spouseLines[char1Id];
@@ -796,7 +805,77 @@ void MainWindow::updateAllLines()
     }
 }
 
+void MainWindow::on_removeSpousesRequested(QString characterId)
+{
+    if (!charactersById.contains(characterId)) return;
+    CharacterData *cd = charactersById[characterId];
 
+    // remove all spouse connections
+    for (const QString &spouseId : cd->spouseIds) {
+        if (charactersById.contains(spouseId)) {
+            CharacterData *spouse = charactersById[spouseId];
+            spouse->spouseIds.removeAll(characterId);
+        }
+        if (spouseLines.contains(characterId)) {
+            QGraphicsPathItem *lineItem = spouseLines.take(characterId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+        if (spouseLines.contains(spouseId)) {
+            QGraphicsPathItem *lineItem = spouseLines.take(spouseId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+    }
+    cd->spouseIds.clear();
+}
+
+void MainWindow::on_removeParentsRequested(QString characterId)
+{
+    if (!charactersById.contains(characterId)) return;
+    CharacterData *cd = charactersById[characterId];
+
+    if (!cd->motherId.isEmpty()) {
+        const QString &motherId = cd->motherId;
+        if (parentLines.contains(characterId)) {
+            QGraphicsPathItem *lineItem = parentLines.take(characterId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+        if (parentLines.contains(motherId)) {
+            QGraphicsPathItem *lineItem = parentLines.take(motherId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+    }
+    if (!cd->fatherId.isEmpty()) {
+        const QString &fatherId = cd->fatherId;
+        if (parentLines.contains(characterId)) {
+            QGraphicsPathItem *lineItem = parentLines.take(characterId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+        if (parentLines.contains(fatherId)) {
+            QGraphicsPathItem *lineItem = parentLines.take(fatherId);
+            if (lineItem) {
+                familyTreeScene->removeItem(lineItem);
+                delete lineItem;
+            }
+        }
+    }
+    cd->motherId.clear();
+    cd->fatherId.clear();
+}
 
 void MainWindow::on_dna_checkBox_checkStateChanged(const Qt::CheckState &state)
 {
@@ -829,7 +908,7 @@ void MainWindow::updateDnaIfChecked(CharacterData *c)
     } else {
         c->dna = ui->dnaField->text();
     }
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 void MainWindow::on_AGOT_checkBox_checkStateChanged(const Qt::CheckState &state)
@@ -880,7 +959,7 @@ void MainWindow::on_actionChange_character_index_triggered()
     ui->rtraits_checkBox->setChecked(activeCharacter->disallowRandomTraits);
 
     updateAllCharacterText();
-    ui->openFileEdit_newchars->verticalScrollBar()->setValue(ui->openFileEdit_newchars->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 
@@ -901,6 +980,7 @@ void MainWindow::on_actionToggle_DNA_field_toggled(bool state)
         ui->dnaField->setVisible(true);
         ui->dna_checkBox->setVisible(true);
     }
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 
@@ -920,6 +1000,7 @@ void MainWindow::on_actionToggle_Death_date_field_toggled(bool state)
         ui->deathday->setVisible(true);
         ui->deathdayField->setVisible(true);
     }
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
 

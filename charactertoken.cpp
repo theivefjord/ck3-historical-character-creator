@@ -60,7 +60,7 @@ void CharacterToken::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                     character->spouseIds.append(otherToken->getCharacterData()->id);
                     otherToken->getCharacterData()->spouseIds.append(character->id);
                     // snap tokens a bit so they're not overlapping
-                    //this->setPos(otherToken->scenePos().x() - 120, otherToken->scenePos().y());
+                    this->setPos(otherToken->scenePos().x() - 120, otherToken->scenePos().y());
                     //qDebug() << "emitting spousSet signal for" << character->id + " and" << otherToken->getCharacterData()->id;
                     emit spousesSet(character->id, otherToken->getCharacterData()->id);
                 }
@@ -88,13 +88,17 @@ void CharacterToken::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             if (event->button() == Qt::RightButton){
                 QMenu menu;
                 QAction *removeSpouseAction = menu.addAction("Remove spouses");
+                QAction *removeParentsAction = menu.addAction("Remove Parents");
                 QAction *selectedAction = menu.exec(event->screenPos());
 
                 if (selectedAction == removeSpouseAction){
                     qDebug() << "remove Spouse";
                     emit removeSpousesRequested(character->id);
                 }
-                if (selectedAction == removeSpouseAction) {
+                if (selectedAction == removeParentsAction){
+                    emit removeParentsRequested(character->id);
+                }
+                if (selectedAction == removeSpouseAction || selectedAction == removeParentsAction) {
                     emit relationshipsChanged();
                 }
             }

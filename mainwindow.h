@@ -63,6 +63,7 @@ private slots:
     void on_actionReload_Text_not_file_triggered();
     void on_openFileEdit_modificationChanged(bool arg1);
     void on_removeSpousesRequested(QString characterId);
+    void on_removeParentsRequested(QString characterId);
 };
 
 #endif // MAINWINDOW_H
