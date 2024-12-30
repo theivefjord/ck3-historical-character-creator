@@ -20,6 +20,7 @@ signals:
     void spousesSet(QString character1Id, QString character2Id);
     void parentSet(QString character1Id, QString character2Id);
     void tokenMoved(QString characterId);
+    void removeSpousesRequested(QString characterId);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;

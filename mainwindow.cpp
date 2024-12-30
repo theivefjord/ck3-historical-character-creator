@@ -13,18 +13,19 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    currentFile = "";
+    setWindowTitle(tr("Untitled"));
+    // date validator stuff
+    QRegularExpression re("^\\d+\\.(1[0-2]|[1-9])\\.(30|[12]\\d|[1-9])$");
+    QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
+    // for random example character generation
+    srand(static_cast<unsigned int>(time(0)));
+
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
     connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::saveFileAs);
     connect(ui->actionClose, &QAction::triggered, this, &MainWindow::closeFile);
     connect(ui->actionReload_File, &QAction::triggered, this, &MainWindow::reloadFile);
-    currentFile = "";
-    setWindowTitle(tr("Untitled"));
-    // datevalidator stuff
-    QRegularExpression re("^\\d+\\.(1[0-2]|[1-9])\\.(30|[12]\\d|[1-9])$");
-    QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
-    srand(static_cast<unsigned int>(time(0)));
-
     connect(ui->nameField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->dnaField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     connect(ui->religionField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
@@ -34,11 +35,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->bdayField->setValidator(dateValidator);
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     ui->deathdayField->setValidator(dateValidator);
-    // create example character
-
-
-
-
 
     // family tree stuff
     familyTreeScene = new QGraphicsScene(this);
@@ -62,6 +58,21 @@ MainWindow::MainWindow(QWidget *parent)
     ui->inquisitive->setVisible(false);
     ui->authoritative->setVisible(false);
     ui->rude->setVisible(false);
+}
+
+void MainWindow::on_removeSpousesRequested(QString characterId)
+{
+    if (!charactersById.contains(characterId)) return;
+    CharacterData *cd = charactersById[characterId];
+
+    // remove all spouse connections
+    for (const QString &spouseId : cd->spouseIds) {
+        if (charactersById.contains(spouseId)) {
+            CharacterData *spouse = charactersById[spouseId];
+            spouse->spouseIds.removeAll(characterId);
+        }
+    }
+    cd->spouseIds.clear();
 }
 
 void MainWindow::initializeCharacterSheet()
@@ -625,6 +636,7 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     connect(token, &CharacterToken::spousesSet, this, &MainWindow::drawSpouseLine);
     connect(token, &CharacterToken::parentSet, this, &MainWindow::drawParentLine);
     connect(token, &CharacterToken::tokenMoved, this, &MainWindow::updateAllLines);
+    connect(token, &CharacterToken::removeSpousesRequested, this, &MainWindow::on_removeSpousesRequested);
 
     // start at base position
     int x = 0, y = 0;
@@ -664,7 +676,7 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
     // decide where line starts from
     QPointF startPoint;
     if (!fatherId.isEmpty() && !motherId.isEmpty()){
-        // two parents know check if spouse
+        // two parents known check if spouse
         if (!tokensById.contains(fatherId) || !tokensById.contains(motherId))
             return;
 
@@ -705,11 +717,8 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
 
 void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 {
-    //qDebug() << "drawSpouseLine called with:" << char1Id << char2Id;
-
     if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
     {
-    //    qDebug() << "one of the tokens is not in tokensbyid.";
         return;
     }
 
@@ -718,23 +727,40 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 
     // get positions
     QPointF pos2 = token2->scenePos();
-    token1->setPos(pos2.x() - 120, pos2.y()); // align tokens for line
+    //token1->setPos(pos2.x() - 120, pos2.y()); // align tokens for line
     QPointF pos1 = token1->scenePos();
 
-    //qDebug() << "pos1:" << pos1 << "pos2" << pos2;
+    //QPointF startPoint;
+    QRectF spouse1Rect = token1->boundingRect();
+    //QPointF pos1 = token1->scenePos();
+    QPointF startPoint = pos1 + QPointF(spouse1Rect.width(), spouse1Rect.height()/2);
+    //QPointF pos2 = token2->scenePos();
+    QRectF spouse2Rect = token2->boundingRect();
+    QPointF endPoint = pos2 + QPointF(spouse2Rect.width()*0, spouse2Rect.height()/2);
 
+    qreal startX = startPoint.x();
+    qreal startY = startPoint.y();
+    qreal endX = endPoint.x();
+    qreal endY = endPoint.y();
 
-    // create a line item between them
-    QGraphicsLineItem *line = new QGraphicsLineItem(QLineF(pos1.x() + 100, pos1.y() + 25, pos2.x(), pos2.y() + 25));
-    line->setPen(QPen(Qt::white, 3));
-    // add line
-    familyTreeScene->addItem(line);
+    qreal midX = (startX + endX) / 2;
 
-    QGraphicsItemGroup *spouseGroup = familyTreeScene->createItemGroup({token1, token2, line});
-    spouseGroup->setFlag(QGraphicsItem::ItemIsMovable, true);
-    //spouseGroup->setFlag(QGraphicsItem::ItemIsSelectable, true);
-    token1->setFlag(QGraphicsItem::ItemIsMovable, false);
-    token2->setFlag(QGraphicsItem::ItemIsMovable, false);
+    // create path
+    QPainterPath path(startPoint);
+    // fuck this math shit i have no idea but it works 💀
+    path.lineTo(midX, startY);
+
+    path.lineTo(midX, endY);
+
+    path.lineTo(endX, endY);
+
+    if (spouseLines.contains(char1Id)) {
+        QGraphicsPathItem *lineItem = spouseLines[char1Id];
+        lineItem->setPath(path);
+    } else {
+        QGraphicsPathItem *lineItem = familyTreeScene->addPath(path, QPen(Qt::white, 3));
+        spouseLines[char1Id] = lineItem;
+    }
 }
 
 void MainWindow::updateAllLines()
@@ -758,7 +784,18 @@ void MainWindow::updateAllLines()
             drawParentLine(childId, fatherId);
         }
     }
+    // for spouse lines
+    for (auto it = spouseLines.begin(); it != spouseLines.end(); ++it) {
+        QString spouseKey = it.key();
+        if (!charactersById.contains(spouseKey)) continue; // safety check
+        CharacterData *cdata = charactersById[spouseKey];
+        // only 1 spouse per for now
+        for (const QString &spouseId : cdata->spouseIds) {
+            drawSpouseLine(spouseKey, spouseId);
+        }
+    }
 }
+
 
 
 void MainWindow::on_dna_checkBox_checkStateChanged(const Qt::CheckState &state)

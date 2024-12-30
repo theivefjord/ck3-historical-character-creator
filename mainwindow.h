@@ -31,6 +31,7 @@ private:
     QMap<QString, CharacterData*> charactersById;
     QMap<QString, CharacterToken*> tokensById;
     QMap<QString, QGraphicsPathItem*> parentLines;
+    QMap<QString, QGraphicsPathItem*> spouseLines;
 
     QString formatCharacter(CharacterData *character, int characterIndex);
     void addCharacterToScene(CharacterData *character);
@@ -61,6 +62,7 @@ private slots:
     void on_actionToggle_Death_date_field_toggled(bool arg1);
     void on_actionReload_Text_not_file_triggered();
     void on_openFileEdit_modificationChanged(bool arg1);
+    void on_removeSpousesRequested(QString characterId);
 };
 
 #endif // MAINWINDOW_H
