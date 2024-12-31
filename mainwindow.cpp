@@ -7,6 +7,8 @@
 #include "characterdata.h"
 #include "QValidator"
 #include <QInputDialog>
+#include <QProcess>
+#include <QDir>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -16,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     currentFile = "";
     setWindowTitle(tr("Untitled"));
     // date validator stuff
-    QRegularExpression re("^\\d+\\.(1[0-2]|[1-9])\\.(30|[12]\\d|[1-9])$");
+    QRegularExpression re("^(\\d{0,5})(\\.(1[0-2]|[1-9])?)?(\\.(3[0]|[12]\\d|[1-9])?)?$");
     QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
     // for random example character generation
     srand(static_cast<unsigned int>(time(0)));
@@ -311,7 +313,44 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+static QString returnLatestBirthDate(CharacterData *spouseData, CharacterData *character)
+{
+    // for comparing and returning the latest birth year to use for the add_spouse block in both characters
+    // changed to new method with math that hopefully makes sense 💀
+    QStringList charParts = character->birth.split('.');
+    QStringList spouseParts = spouseData->birth.split('.');
+    if (charParts.size() < 3 || spouseParts.size() < 3) {
+        return "wrong.date.format"; // handle incomplete birth date input
+    }
 
+    int cy = charParts[0].toInt(); // char birth year
+    int cm = charParts[1].toInt(); // char birth month
+    int cd = charParts[2].toInt(); // char birth day
+
+    int sy = spouseParts[0].toInt();    // spouse birth year
+    int sm = spouseParts[1].toInt();    // spouse birth month
+    int sd = spouseParts[2].toInt();    // spouse birth day
+
+    // build integer date format
+    int dateChar = cy * 10000 + cm * 100 + cd;
+    int dateSpouse = sy * 10000 + sm * 100 + sd;
+
+    // decide which is later
+    int latestYear, latestMonth, latestDay;
+    if (dateChar > dateSpouse) {
+        latestYear = cy;
+        latestMonth = cm;
+        latestDay = cd;
+    } else {
+        latestYear = sy;
+        latestMonth = sm;
+        latestDay = sd;
+    }
+
+    latestYear += 16; //add 16 to the year
+
+    return QString("%1.%2.%3").arg(latestYear).arg(latestMonth).arg(latestDay);
+}
 QString MainWindow::formatCharacter(CharacterData *character, int characterIndex)
 {
     QString formattedText;
@@ -417,15 +456,7 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
 
         QString spouseLabel = buildDynastyName(spouseData);
 
-        QStringList birthParts = character->birth.split('.');
-        int birthyearPlus16 = 0;
-        //QString earliestMarryDate = "x.x.x";
-        if (birthParts.size() == 3){
-            int birthYear = birthParts[0].toInt();
-            birthyearPlus16 = birthYear + 16;
-        }
-        QString earliestMarryDate = QString::number(birthyearPlus16) + "." + birthParts[1] + "." + birthParts[2];
-        formattedText += QString("\t%2 = { add_spouse = %1 }\n").arg(spouseLabel).arg(earliestMarryDate);
+        formattedText += QString("\t%2 = { add_spouse = %1 }\n").arg(spouseLabel).arg(returnLatestBirthDate(character, spouseData));
     }
 
     if (!character->death.isEmpty())
@@ -1013,5 +1044,21 @@ void MainWindow::on_actionReload_Text_not_file_triggered()
 void MainWindow::on_openFileEdit_modificationChanged(bool changed)
 {
     if (changed == true) setWindowTitle("*" + currentFile);
+}
+
+
+void MainWindow::on_actionOpen_in_File_Explorer_triggered()
+{
+    if (!currentFile.isEmpty()) {
+        QString nativePath = QDir::toNativeSeparators(currentFile);
+
+        QStringList args;
+        args << "/select," << nativePath;
+
+        QProcess::startDetached("explorer", args);
+    }
+    else {
+        statusBar()->showMessage(tr("No File Open"), 3000);
+    }
 }
 

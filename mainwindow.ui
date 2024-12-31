@@ -5608,6 +5608,7 @@ border-radius: 12px;
     <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
     <addaction name="actionSave_As"/>
+    <addaction name="actionOpen_in_File_Explorer"/>
     <addaction name="actionReload_File"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
@@ -5695,6 +5696,11 @@ border-radius: 12px;
    </property>
    <property name="text">
     <string>Toggle Death Date Field</string>
+   </property>
+  </action>
+  <action name="actionOpen_in_File_Explorer">
+   <property name="text">
+    <string>Open in File Explorer</string>
    </property>
   </action>
  </widget>
