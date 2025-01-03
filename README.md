@@ -21,7 +21,7 @@
   </ul>
 </ul>
 <h1>Installation</h1>
-I only have a Windows built app for now, I have to look into some of my OS specific functions further and figure out how to deploy for not-windows, but I'm working on it.
+I only have a Windows built app for now, I have to look into some of my OS specific functions further and figure out how to deploy for Linux and Mac, but I'm working on it.
 <ol>
     <li>Download the <b>Latest Release</b>.</li>
     <li>Unzip the files.</li>
