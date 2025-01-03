@@ -13,12 +13,18 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="sizePolicy">
@@ -226,7 +232,7 @@
               </size>
              </property>
              <property name="currentIndex">
-              <number>2</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="personalityTraitTab">
               <attribute name="title">
@@ -246,6 +252,9 @@
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Temperate</string>
@@ -295,6 +304,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Zealous</string>
                  </property>
@@ -342,6 +354,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Chaste</string>
@@ -391,6 +406,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Patient</string>
                  </property>
@@ -438,6 +456,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Compassionate</string>
@@ -487,6 +508,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Ambitious</string>
                  </property>
@@ -534,6 +558,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Trusting</string>
@@ -583,6 +610,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Just</string>
                  </property>
@@ -630,6 +660,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Greedy</string>
@@ -679,6 +712,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Rude</string>
                  </property>
@@ -726,6 +762,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Eccentric</string>
@@ -775,6 +814,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Gregarious</string>
                  </property>
@@ -822,6 +864,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Fickle</string>
@@ -871,6 +916,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Gluttonous</string>
                  </property>
@@ -918,6 +966,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Impatient</string>
@@ -967,6 +1018,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Humble</string>
                  </property>
@@ -1014,6 +1068,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Wrathful</string>
@@ -1063,6 +1120,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Brave</string>
                  </property>
@@ -1110,6 +1170,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Arrogant</string>
@@ -1159,6 +1222,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Content</string>
                  </property>
@@ -1206,6 +1272,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Cynical</string>
@@ -1255,6 +1324,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Diligent</string>
                  </property>
@@ -1303,6 +1375,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Callous</string>
                  </property>
@@ -1350,6 +1425,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Arbitrary</string>
@@ -1402,6 +1480,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Sadistic</string>
                  </property>
@@ -1449,6 +1530,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Forgiving</string>
@@ -1498,6 +1582,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Honest</string>
                  </property>
@@ -1545,6 +1632,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Lustful</string>
@@ -1594,6 +1684,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Shy</string>
                  </property>
@@ -1641,6 +1734,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Vengeful</string>
@@ -1690,6 +1786,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Craven</string>
                  </property>
@@ -1737,6 +1836,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Calm</string>
@@ -1786,6 +1888,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Stubborn</string>
                  </property>
@@ -1833,6 +1938,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Generous</string>
@@ -1882,6 +1990,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Paranoid</string>
                  </property>
@@ -1929,6 +2040,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Lazy</string>
@@ -2018,6 +2132,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Deceitful</string>
                  </property>
@@ -2065,6 +2182,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Authoritative</string>
@@ -2117,6 +2237,9 @@ border-radius: 5px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Inquisitive</string>
                  </property>
@@ -2154,6 +2277,9 @@ border-radius: 5px;
               </layout>
              </widget>
              <widget class="QWidget" name="educationTraitTab">
+              <property name="styleSheet">
+               <string notr="true"/>
+              </property>
               <attribute name="title">
                <string>Education</string>
               </attribute>
@@ -2171,6 +2297,9 @@ border-radius: 5px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -2216,6 +2345,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Bossy</string>
@@ -2265,6 +2397,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string/>
                  </property>
@@ -2313,6 +2448,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2357,6 +2495,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -2403,6 +2544,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2448,6 +2592,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2492,6 +2639,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Curious</string>
@@ -2541,6 +2691,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2585,6 +2738,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -2631,6 +2787,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2675,6 +2834,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Rowdy</string>
@@ -2724,6 +2886,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2768,6 +2933,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Pensive</string>
@@ -2817,6 +2985,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2861,6 +3032,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Charming</string>
@@ -2910,6 +3084,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -2954,6 +3131,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3000,6 +3180,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3044,6 +3227,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3090,6 +3276,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3134,6 +3323,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3180,6 +3372,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3224,6 +3419,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3270,6 +3468,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3314,6 +3515,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3360,6 +3564,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3404,6 +3611,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3450,6 +3660,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3494,6 +3707,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3540,6 +3756,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3584,6 +3803,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3630,6 +3852,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3675,6 +3900,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3719,6 +3947,9 @@ border-radius: 7px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -3772,6 +4003,9 @@ border-radius: 7px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Possessed</string>
                  </property>
@@ -3819,6 +4053,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3863,6 +4100,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -3906,6 +4146,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Herculean/Amazonian</string>
@@ -3954,6 +4197,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Fecund</string>
                  </property>
@@ -4000,6 +4246,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Beautiful</string>
@@ -4048,6 +4297,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4091,6 +4343,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Genius</string>
@@ -4139,6 +4394,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Wheezing</string>
                  </property>
@@ -4185,6 +4443,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Lunatic</string>
@@ -4233,6 +4494,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Dwarf</string>
                  </property>
@@ -4280,6 +4544,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4323,6 +4590,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -4368,6 +4638,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4412,6 +4685,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4455,6 +4731,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Melancholic</string>
@@ -4503,6 +4782,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Lisping</string>
                  </property>
@@ -4549,6 +4831,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Stuttering</string>
@@ -4597,6 +4882,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Spindly</string>
                  </property>
@@ -4643,6 +4931,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Infertile</string>
@@ -4691,6 +4982,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Clubfooted</string>
                  </property>
@@ -4738,6 +5032,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4782,6 +5079,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -4825,6 +5125,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Albino</string>
@@ -4873,6 +5176,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Bleeder</string>
                  </property>
@@ -4919,6 +5225,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Giant</string>
@@ -4967,6 +5276,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Hunchbacked</string>
                  </property>
@@ -5013,6 +5325,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Scaly</string>
@@ -5061,6 +5376,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string>Pure-blooded</string>
                  </property>
@@ -5107,6 +5425,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Very ugly</string>
@@ -5155,6 +5476,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="toolTip">
                   <string/>
                  </property>
@@ -5201,6 +5525,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Very dumb</string>
@@ -5249,6 +5576,9 @@ border-radius: 12px;
                    <height>25</height>
                   </size>
                  </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
+                 </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
 background: transparent;
@@ -5292,6 +5622,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="toolTip">
                   <string>Very weak</string>
@@ -5339,6 +5672,9 @@ border-radius: 12px;
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="focusPolicy">
+                  <enum>Qt::FocusPolicy::NoFocus</enum>
                  </property>
                  <property name="styleSheet">
                   <string notr="true">QPushButton {
@@ -5591,7 +5927,6 @@ border-radius: 12px;
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -5626,6 +5961,7 @@ border-radius: 12px;
    <addaction name="menuFile"/>
    <addaction name="menuText"/>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>

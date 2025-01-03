@@ -3,6 +3,7 @@
 
 #include "characterdata.h"
 #include "charactertoken.h"
+#include "windowframe.h"
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QTextStream>
@@ -21,6 +22,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void setWindowFrame(WindowFrame* f) { mWindowFrame = f; }; // stores a pointer to the windowframe instance
 
 private:
     Ui::MainWindow *ui;
@@ -32,12 +34,14 @@ private:
     QMap<QString, CharacterToken*> tokensById;
     QMap<QString, QGraphicsPathItem*> parentLines;
     QMap<QString, QGraphicsPathItem*> spouseLines;
-
     QString formatCharacter(CharacterData *character, int characterIndex);
+    WindowFrame *mWindowFrame = nullptr;
+
     void addCharacterToScene(CharacterData *character);
     void exampleCharacterSelection(CharacterData *initialCharacter);
     void updateDnaIfChecked(CharacterData *c);
     void initializeCharacterSheet();
+
 
 private slots:
     void openFile();
@@ -45,7 +49,6 @@ private slots:
     void saveFile();
     void closeFile();
     void reloadFile();
-    // remember to make a death reason selection input after the death date thingy
     void on_FieldEdited(const QString &text);
     void on_addCharacter_clicked();
     void on_female_checkBox_stateChanged(int arg1);

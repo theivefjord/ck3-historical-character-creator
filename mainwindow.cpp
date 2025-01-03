@@ -9,20 +9,21 @@
 #include <QInputDialog>
 #include <QProcess>
 #include <QDir>
+#include "windowframe.h"
 
+const QString title = "Untitled";
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     currentFile = "";
-    setWindowTitle(tr("Untitled"));
     // date validator stuff
     QRegularExpression re("^(\\d{0,5})(\\.(1[0-2]|[1-9])?)?(\\.(3[0]|[12]\\d|[1-9])?)?$");
     QRegularExpressionValidator *dateValidator = new QRegularExpressionValidator(re, this);
     // for random example character generation
     srand(static_cast<unsigned int>(time(0)));
-
+    // connecting stuff, from when I just started out but apparently isn't really necessary when working through designer
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::openFile);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::saveFile);
     connect(ui->actionSave_As, &QAction::triggered, this, &MainWindow::saveFileAs);
@@ -37,14 +38,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->bdayField->setValidator(dateValidator);
     connect(ui->deathdayField, &QLineEdit::textEdited, this, &MainWindow::on_FieldEdited);
     ui->deathdayField->setValidator(dateValidator);
-
     // family tree stuff
     familyTreeScene = new QGraphicsScene(this);
     ui->familyTreeView->setScene(familyTreeScene);
-
+    // for example character on launch
     initializeCharacterSheet();
-
-
     // trait buttons
     QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
     for (QPushButton *button : traitButtons)
@@ -60,10 +58,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->inquisitive->setVisible(false);
     ui->authoritative->setVisible(false);
     ui->rude->setVisible(false);
-    // set drag mode in 2nd tab
+    // set drag mode in family tree view
     ui->familyTreeView->setDragMode(QGraphicsView::ScrollHandDrag);
 }
-
+// this is for example char on launch and also clearing the character sheet when reloading character sheet
 void MainWindow::initializeCharacterSheet()
 {
     characters.clear();
@@ -79,7 +77,7 @@ void MainWindow::initializeCharacterSheet()
     addCharacterToScene(initialCharacter);
     updateAllCharacterText();
 }
-
+// for my example characters (yea I read books 😏)
 void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
 {
     int randNum = rand() % 5;
@@ -196,7 +194,7 @@ void MainWindow::exampleCharacterSelection(CharacterData *initialCharacter)
         updateAllCharacterText();
     }
 }
-
+// open file & rename window to filename
 void MainWindow::openFile()
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), "", tr("Text Files (*.txt);;All Files (*)"));
@@ -209,10 +207,13 @@ void MainWindow::openFile()
             ui->openFileEdit->setPlainText(in.readAll());
             file.close();
             currentFile = fileName;
-            setWindowTitle(fileName);
+            if (mWindowFrame){
+                mWindowFrame->setTitle(fileName);
+            }
         }
     }
 }
+// save file as & rename window to file (to remove the * that I add to show when the file is modified and unsaved)
 void MainWindow::saveFileAs()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), "", tr("Text Files (*.txt);;All Files (*)"));
@@ -225,10 +226,14 @@ void MainWindow::saveFileAs()
             out << ui->openFileEdit->toPlainText();
             file.close();
             ui->openFileEdit->document()->setModified(false);
-            setWindowTitle(currentFile);
+            if (mWindowFrame){
+                mWindowFrame->setTitle(fileName);
+            }
+            currentFile = fileName;
         }
     }
 }
+// save file & rename window to file (to remove the * that I add to show when the file is modified and unsaved)
 void MainWindow::saveFile()
 {
     if (currentFile.isEmpty())
@@ -244,10 +249,13 @@ void MainWindow::saveFile()
             out << ui->openFileEdit->toPlainText();
             file.close();
             ui->openFileEdit->document()->setModified(false);
-            setWindowTitle(currentFile);
+            if (mWindowFrame){
+                mWindowFrame->setTitle(currentFile);
+            }
         }
     }
 }
+// close file & ask to save if modified & rename window to untitled
 void MainWindow::closeFile()
 {
     if (ui->openFileEdit->document()->isModified())
@@ -268,12 +276,14 @@ void MainWindow::closeFile()
             return;
         }
     }
-
     ui->openFileEdit->clear();
     currentFile = "";
     ui->openFileEdit->document()->setModified(false);
-    setWindowTitle(tr("Untitled"));
+    if (mWindowFrame){
+        mWindowFrame->setTitle("Untitled");
+    }
 }
+// reload file & ask to save if modified (just in case) & rename window to current file (in case file is modified and is saved)
 void MainWindow::reloadFile()
 {
     if (ui->openFileEdit->document()->isModified())
@@ -281,7 +291,7 @@ void MainWindow::reloadFile()
         QMessageBox::StandardButton reply = QMessageBox::question(
             this,
             tr("Unsaved Changes"),
-            tr("You have unsaved changes. Do you want to save them before closing?"),
+            tr("You have unsaved changes. Do you want to save them before reloading?"),
             QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel
             );
 
@@ -303,20 +313,23 @@ void MainWindow::reloadFile()
             ui->openFileEdit->setPlainText(in.readAll());
             file.close();
             ui->openFileEdit->document()->setModified(false);
-            setWindowTitle(currentFile);
+            //setWindowTitle(currentFile);
+            if (mWindowFrame){
+                mWindowFrame->setTitle(currentFile);
+            }
             statusBar()->showMessage(tr("File reloaded successfully"), 3000);
         }
     }
 }
-
+// destructor
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+// for comparing and returning the latest birth year to use for the add_spouse block in both characters
+// changed to new method with math that hopefully works well 💀
 static QString returnLatestBirthDate(CharacterData *spouseData, CharacterData *character)
 {
-    // for comparing and returning the latest birth year to use for the add_spouse block in both characters
-    // changed to new method with math that hopefully makes sense 💀
     QStringList charParts = character->birth.split('.');
     QStringList spouseParts = spouseData->birth.split('.');
     if (charParts.size() < 3 || spouseParts.size() < 3) {
@@ -351,6 +364,7 @@ static QString returnLatestBirthDate(CharacterData *spouseData, CharacterData *c
 
     return QString("%1.%2.%3").arg(latestYear).arg(latestMonth).arg(latestDay);
 }
+// handles the formatting for the text input from the QLineEdit/abbreviated traits/family tree connections
 QString MainWindow::formatCharacter(CharacterData *character, int characterIndex)
 {
     QString formattedText;
@@ -466,10 +480,9 @@ QString MainWindow::formatCharacter(CharacterData *character, int characterIndex
     formattedText += "}\n\n";
     return formattedText;
 }
-
+// is called when a QLineEdit is used
 void MainWindow::on_FieldEdited(const QString &text)
 {
-    //CharacterData *activeChar = characters.last();
     if (characters.isEmpty())
         return;
 
@@ -512,13 +525,13 @@ void MainWindow::on_FieldEdited(const QString &text)
     else if (key == "death")
         activeChar->death = text;
 
-    // if dna checkbox is checked updated DNA
+    // if dna checkbox is checked update DNA
     updateDnaIfChecked(activeChar);
 
     updateAllCharacterText();
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
-
+// handler for QPushButtons being pressed inside the trait tabs
 void MainWindow::on_traitButton_clicked()
 {
     QPushButton *button = qobject_cast<QPushButton*>(sender());
@@ -549,7 +562,7 @@ void MainWindow::on_traitButton_clicked()
     ui->characterSheet->ensureCursorVisible();
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
-
+// handler for the add character button, also calls the character token handler for the family tree tab
 void MainWindow::on_addCharacter_clicked()
 {
     if (characters.isEmpty())
@@ -594,7 +607,7 @@ void MainWindow::on_addCharacter_clicked()
         if (button->isChecked()) button->setChecked(false);
     }
 }
-
+// handler for the female qcheckbox
 void MainWindow::on_female_checkBox_stateChanged(int state)
 {
     if (characters.isEmpty())
@@ -615,7 +628,7 @@ void MainWindow::on_female_checkBox_stateChanged(int state)
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
 
-
+// handler for the random traits qcheckbox
 void MainWindow::on_rtraits_checkBox_stateChanged(int state)
 {
     if (characters.isEmpty())
@@ -637,6 +650,7 @@ void MainWindow::on_rtraits_checkBox_stateChanged(int state)
     updateAllCharacterText();
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
+// is called in all the handlers that deal with the character sheet QTextEdit, it updates that QTextEdit
 void MainWindow::updateAllCharacterText()
 {
     QString updatedText;
@@ -646,11 +660,11 @@ void MainWindow::updateAllCharacterText()
     }
     ui->characterSheet->setPlainText(updatedText);
 }
-
+// handler for character tokens, it adds them to the family tree view
 void MainWindow::addCharacterToScene(CharacterData *character)
 {
     CharacterToken *token = new CharacterToken(character);
-    // connect token signal to slot in MainWindow
+    // connects signals from charactertoken.h
     connect(token, &CharacterToken::relationshipsChanged, this, &MainWindow::updateAllCharacterText);
     connect(token, &CharacterToken::spousesSet, this, &MainWindow::drawSpouseLine);
     connect(token, &CharacterToken::parentSet, this, &MainWindow::drawParentLine);
@@ -662,7 +676,7 @@ void MainWindow::addCharacterToScene(CharacterData *character)
     int x = 0, y = 0;
     token->setPos(x, y);
     familyTreeScene->addItem(token);
-
+    // move until the new token isnt colliding with anyone
     while (!token->collidingItems().isEmpty()) {
         x += 20;
         token->setPos(x, y);
@@ -676,19 +690,18 @@ void MainWindow::addCharacterToScene(CharacterData *character)
 
     tokensById[character->id] = token;
 }
-
+// for drawing the line between children and parents
 void MainWindow::drawParentLine(QString childId, QString parentId)
 {
-    // make sure both exist
+    // make sure both tokens exist
     if (!tokensById.contains(childId) || !tokensById.contains(parentId)){
-        qDebug() << "one of the tokens is missing / drawParentLine";
         return;
     }
-
+    // get tokens
     CharacterToken *childToken = tokensById[childId];
     CharacterToken *parentToken = tokensById[parentId];
 
-    // get child's CharacterData and parent(s)
+    // get child's and and parent(s) CharacterData
     CharacterData *childData = charactersById[childId];
     QString fatherId = childData->fatherId;
     QString motherId = childData->motherId;
@@ -696,13 +709,13 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
     // decide where line starts from
     QPointF startPoint;
     if (!fatherId.isEmpty() && !motherId.isEmpty()){
-        // two parents known check if spouse
+        // two parents known
         if (!tokensById.contains(fatherId) || !tokensById.contains(motherId))
             return;
 
         CharacterToken *fatherToken = tokensById[fatherId];
         CharacterToken *motherToken = tokensById[motherId];
-
+        // get parent positions to calculate startpoint later
         QPointF fatherPos = fatherToken->scenePos();
         QRectF fatherRect = fatherToken->boundingRect();
         QPointF fatherBottom(
@@ -717,8 +730,7 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
             motherPos.y() + motherRect.height()
             );
 
-        // same offset as spouseLine
-        qreal offset = 15;
+        qreal offset = 15; // same offset as spouseLine so they line up
 
         qreal lowestY = qMax(fatherBottom.y(), motherBottom.y());
         qreal sharedY = lowestY + offset;
@@ -745,7 +757,7 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
     path.lineTo(endPoint.x(), midY);   // horizontal line over child's x
     path.lineTo(endPoint);            // down to child's top
 
-    // if a line already exists for this child (might be redrawing)
+    // if a line already exists for this child update else redraw
     if (parentLines.contains(childId)) {
         QGraphicsPathItem *lineItem = parentLines[childId];
         lineItem->setPath(path);
@@ -754,12 +766,14 @@ void MainWindow::drawParentLine(QString childId, QString parentId)
         parentLines[childId] = lineItem;
     }
 }
-
+// for drawing a line between spouses
+// this went through some iterations but landed on offsetting the line down a bit
+// the original way was causing issues when un-spousing and re-spousing in a different order
 void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 {
+    // make sure both tokens exist
     if (!tokensById.contains(char1Id) || !tokensById.contains(char2Id))
     {
-        qDebug() << "one of the tokens is missing / drawSpouseLine";
         return;
     }
 
@@ -780,7 +794,7 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
         pos2.y() + rect2.height()
         );
 
-    qreal offset = 15;
+    qreal offset = 15; // same offset as parentlines to make them line up
     qreal lowestBottom = qMax(bottomCenter1.y(), bottomCenter2.y());
     qreal sharedY = lowestBottom + offset;
 
@@ -793,7 +807,7 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
 
     path.lineTo(bottomCenter2);
 
-
+    // if line exists update else draw
     if (spouseLines.contains(char1Id)) {
         QGraphicsPathItem *lineItem = spouseLines[char1Id];
         lineItem->setPath(path);
@@ -802,7 +816,7 @@ void MainWindow::drawSpouseLine(QString char1Id, QString char2Id)
         spouseLines[char1Id] = lineItem;
     }
 }
-
+// this is called from charactertoken.cpp when a token is moved (the signal is connected inside addCharacterToScene ^ up there)
 void MainWindow::updateAllLines()
 {
     // for each child that has a parent line, recalculate the the path
@@ -835,7 +849,7 @@ void MainWindow::updateAllLines()
         }
     }
 }
-
+// slot for the signal to remove spouses in charactertoken.cpp (right click on character token in family tree)
 void MainWindow::on_removeSpousesRequested(QString characterId)
 {
     if (!charactersById.contains(characterId)) return;
@@ -864,7 +878,7 @@ void MainWindow::on_removeSpousesRequested(QString characterId)
     }
     cd->spouseIds.clear();
 }
-
+// slot for the signal to remove parents in charactertoken.cpp (right click on character token in family tree)
 void MainWindow::on_removeParentsRequested(QString characterId)
 {
     if (!charactersById.contains(characterId)) return;
@@ -907,7 +921,7 @@ void MainWindow::on_removeParentsRequested(QString characterId)
     cd->motherId.clear();
     cd->fatherId.clear();
 }
-
+// for the dna qcheckbox action, sets the line to read only, calls the handler, and updates the text
 void MainWindow::on_dna_checkBox_checkStateChanged(const Qt::CheckState &state)
 {
     if (characters.isEmpty()) return;
@@ -920,7 +934,7 @@ void MainWindow::on_dna_checkBox_checkStateChanged(const Qt::CheckState &state)
 
     updateAllCharacterText();
 }
-
+// handler for automatically updating dna if the dna qcheckbox is checked
 void MainWindow::updateDnaIfChecked(CharacterData *c)
 {
     if (!c) return;
@@ -939,9 +953,9 @@ void MainWindow::updateDnaIfChecked(CharacterData *c)
     } else {
         c->dna = ui->dnaField->text();
     }
-    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
+    ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum()); // there's surely a better way to deal with this fucking scroll wheel always flying up?
 }
-
+// for the qcheckbox that shows/hides the agot traits, cuz I was focusing on my before the doom mod during dev
 void MainWindow::on_AGOT_checkBox_checkStateChanged(const Qt::CheckState &state)
 {
     if (state == Qt::Checked){
@@ -955,8 +969,7 @@ void MainWindow::on_AGOT_checkBox_checkStateChanged(const Qt::CheckState &state)
         ui->rude->setVisible(false);
     }
 }
-
-
+// for changing the character index, which I felt became necessary after making characters for already existing dynasties
 void MainWindow::on_actionChange_character_index_triggered()
 {
     if (characters.isEmpty()) {
@@ -992,8 +1005,8 @@ void MainWindow::on_actionChange_character_index_triggered()
     updateAllCharacterText();
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
-
-
+// this is for the Toggle DNA Field in the Character Sheet dropdown menu
+// because immortal_hybrid made me realize that not every character needs a dna
 void MainWindow::on_actionToggle_DNA_field_toggled(bool state)
 {
     if (characters.isEmpty()) return;
@@ -1013,8 +1026,9 @@ void MainWindow::on_actionToggle_DNA_field_toggled(bool state)
     }
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
-
-
+// this is for the Toggle Death Date Field in the Character Sheet dropdown menu
+// kinda stupid to have this cuz if you're making earlier bookmarks characters should really have death dates so they don't live for 5000 years
+// but if lazy and don't care 🦥
 void MainWindow::on_actionToggle_Death_date_field_toggled(bool state)
 {
     if (characters.isEmpty()) return;
@@ -1033,20 +1047,23 @@ void MainWindow::on_actionToggle_Death_date_field_toggled(bool state)
     }
     ui->characterSheet->verticalScrollBar()->setValue(ui->characterSheet->verticalScrollBar()->maximum());
 }
-
-
+// this is to generate a new example character and clear everything when reloading the character sheet (not the file)
+// brainrot naming convention oops lmao
 void MainWindow::on_actionReload_Text_not_file_triggered()
 {
     initializeCharacterSheet();
 }
-
-
+// for renaming the window to indicate the file being modified and unsaved
 void MainWindow::on_openFileEdit_modificationChanged(bool changed)
 {
-    if (changed == true) setWindowTitle("*" + currentFile);
+    if (!mWindowFrame) return;
+    if (changed) {
+        if (!currentFile.isEmpty()) mWindowFrame->setTitle("*" + currentFile);
+        else mWindowFrame->setTitle("*Untitled");
+    }
 }
-
-
+// for the reveal in explorer action in the file menu
+// reminder to add to this and some of the other OS specific functions at a later date to if attempting cross platform stuff
 void MainWindow::on_actionOpen_in_File_Explorer_triggered()
 {
     if (!currentFile.isEmpty()) {

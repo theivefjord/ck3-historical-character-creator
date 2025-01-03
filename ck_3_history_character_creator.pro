@@ -12,15 +12,18 @@ SOURCES += \
     characterdata.cpp \
     charactertoken.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    windowframe.cpp
 
 HEADERS += \
     characterdata.h \
     charactertoken.h \
-    mainwindow.h
+    mainwindow.h \
+    windowframe.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    windowframe.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
