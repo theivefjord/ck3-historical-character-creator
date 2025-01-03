@@ -1,7 +1,7 @@
 <h1 align="center">CK3 Historical Character Creator</h1>
 <p align="center">A modding tool that aims to make the process of adding characters in the history files more interactive, and less writing the same thing over and over again.</p>
 <h2>Why Use This Tool</h2>
-<p align: left;">Modding historical character files by hand sucks ass because it's</p>
+<p align: left;">Modding historical character files by hand sucks ass because it's:</p>
 <ul style="margin-left: 20px; padding-left: 10px;">
   <li>Time-consuming – writing the same syntax repeatedly.</li>
   <li>Confusing – if you lose track when building the same character.</li>
@@ -21,6 +21,7 @@
   </ul>
 </ul>
 <h1>Installation</h1>
+I only have a Windows built app for now, I have to look into some of my OS specific functions further and figure out how to deploy for not-windows, but I'm working on it.
 <ol>
     <li>Download the <b>Latest Release</b>.</li>
     <li>Unzip the files.</li>
