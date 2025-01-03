@@ -70,6 +70,15 @@ void MainWindow::initializeCharacterSheet()
     parentLines.clear();
     spouseLines.clear();
     familyTreeScene->clear();
+    if (ui->female_checkBox->isChecked()) ui->female_checkBox->setChecked(false);
+    if (ui->rtraits_checkBox->isChecked()) ui->rtraits_checkBox->setChecked(false);
+    // uncheck traits, this is the 3rd instance should I make it a seperate function? Where does one draw the line?
+    QList<QPushButton*> traitButtons = ui->traitTabs->findChildren<QPushButton*>();
+    for (QPushButton *button : traitButtons)
+    {
+        if (button->isChecked()) button->setChecked(false);
+    }
+    ui->traitTabs->setVisible(false);
 
     CharacterData *initialCharacter = new CharacterData();
     exampleCharacterSelection(initialCharacter);
