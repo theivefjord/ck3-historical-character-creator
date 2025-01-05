@@ -9,10 +9,8 @@
 </ul>
 <h1>Key Features</h1>
 <ul style="margin-left: 20px; padding-left: 10px;">
-  <li>Simplified Character Creation:</li>
-  Fill out text fields and watch them automatically format into the proper structure.
-  <li>Interactive Trait Selection:</li>
-  Instead of typing "trait =" 5 billion times you click on some icons.
+  <li>Simplified Character Creation - Fill out text fields and watch them automatically format into the proper structure.</li>
+  <li>Interactive Trait Selection - Instead of typing "trait =" 5 billion times you click on some icons.</li>
   <li>Family Tree View</li>
   <ul>
     <li>Connect parents and children</li>
