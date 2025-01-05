@@ -4,7 +4,7 @@
 <p align: left;">Modding historical character files by hand sucks ass because it's:</p>
 <ul style="margin-left: 20px; padding-left: 10px;">
   <li>Time-consuming – writing the same syntax repeatedly.</li>
-  <li>Confusing – if you lose track when building the same character.</li>
+  <li>Confusing – if you lose track when building the same dynasty.</li>
   <li>Boring – tedious and prone to errors.</li>
 </ul>
 <h1>Key Features</h1>
