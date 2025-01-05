@@ -32,10 +32,6 @@ WindowFrame::WindowFrame(QWidget *parent, QWidget *child)
         resize(child->size());
     }
     adjustSize();
-
-    qDebug() << "WindowFrame geometry:" << geometry();
-    qDebug() << "ui->body geometry:" << ui->body->geometry();
-    qDebug() << "child geometry:" << child->geometry();
 }
 
 /// @brief Destructor for the WindowFrame class.
@@ -131,11 +127,9 @@ void WindowFrame::mouseDoubleClickEvent(QMouseEvent *event) {
         if(widget == ui->LHeader) {
             if(isMaximized()) {
                 ui->maximum->setIcon(QIcon(maximizeIcon));
-                //ui->header->setStyleSheet(headerDefaultStyle);
                 showNormal();
             } else {
                 ui->maximum->setIcon(QIcon(defaultSizeIcon));
-                //ui->header->setStyleSheet(headerMaximizeStyle);
                 showMaximized();
             }
         }
@@ -152,7 +146,7 @@ bool WindowFrame::nativeEvent(const QByteArray &eventType, void *message, qintpt
     MSG *param = static_cast<MSG *>(message);
 
     if (param->message == WM_NCHITTEST) {
-        if (isMaximized()) return false; // dont allow resizing if fullscreened
+        if (isMaximized()) return false; // dont allow resizing if maximized
         QPoint globalPos(GET_X_LPARAM(param->lParam), GET_Y_LPARAM(param->lParam));
         QPoint localPos = mapFromGlobal(globalPos);
 
