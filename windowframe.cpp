@@ -1,8 +1,10 @@
 #include "windowframe.h"
 #include "ui_windowframe.h"
 
+#ifdef _WIN32
 #include <windows.h>
 #include <windowsx.h>
+#endif
 
 #include <QMouseEvent>
 
@@ -141,6 +143,8 @@ void WindowFrame::mouseDoubleClickEvent(QMouseEvent *event) {
 /// @param message Pointer to a structure containing event information (void*).
 /// @param result Pointer to a variable for returning the result (long*).
 /// @return The return value, true if the event was handled, otherwise false.
+/// if building for windows
+#ifdef _WIN32
 bool WindowFrame::nativeEvent(const QByteArray &eventType, void *message, qintptr *result) {
     Q_UNUSED(eventType)
     MSG *param = static_cast<MSG *>(message);
@@ -182,6 +186,20 @@ bool WindowFrame::nativeEvent(const QByteArray &eventType, void *message, qintpt
 
     return QWidget::nativeEvent(eventType, message, result);
 }
+#endif
+
+/// if building for mac
+#ifdef __APPLE__
+bool WindowFrame::nativeEvent(const QByteArray &eventType, void *message, qintptr *result) {
+    Q_UNUSED(eventType)
+    Q_UNUSED(message)
+    Q_UNUSED(result)
+
+    /// apparently we don't need to rebuild for mac because it automatically sorts native window resizing
+    return false;
+}
+#endif
+
 
 /// @brief Show or hide the window minimization button.
 /// @param enable If true, the button will be shown; if false, it will be hidden.

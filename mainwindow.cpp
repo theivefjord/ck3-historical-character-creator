@@ -1078,10 +1078,19 @@ void MainWindow::on_actionOpen_in_File_Explorer_triggered()
     if (!currentFile.isEmpty()) {
         QString nativePath = QDir::toNativeSeparators(currentFile);
 
+#ifdef _WIN32
         QStringList args;
         args << "/select," << nativePath;
-
         QProcess::startDetached("explorer", args);
+#elif __APPLE__
+        QStringList args;
+        args << "-R" << nativePath;
+        QProcess::startDetached("open", args);
+#else
+    // for linux
+    // maybe "xdg-open" or "gio open"
+    QDesktopServices::openUrl(QUrl::fromLocalFile(nativePath));
+#endif
     }
     else {
         statusBar()->showMessage(tr("No File Open"), 3000);
