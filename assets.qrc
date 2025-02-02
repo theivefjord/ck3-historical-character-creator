@@ -120,6 +120,7 @@
         <file>iconthingy/maximize_light.png</file>
         <file>iconthingy/minimize_light.png</file>
         <file>iconthingy/default_size_light.png</file>
+        <file>iconthingy/favicon.icns</file>
     </qresource>
     <qresource prefix="/stylesheet">
         <file>assets/grayboi.qss</file>

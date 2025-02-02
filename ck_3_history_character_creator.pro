@@ -33,5 +33,10 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     assets.qrc
 
-RC_FILE = favicon.rc
+win32 {
+    RC_FILE = favicon.rc
+}
 
+macx {
+    ICON = favicon.icns
+}
