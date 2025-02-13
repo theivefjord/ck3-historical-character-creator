@@ -18,6 +18,10 @@
     <li>Visualize complex family dynamics.</li>
   </ul>
 </ul>
+<h1>Known Issues</h1>
+<ul style="margin-left: 20px; padding-left: 10px;">
+  <li>When testing on my win10 laptop I found that the window resizing won't work if the <b>size of text, apps and other items</b> is set to anything other than 100%, this setting is found on Windows 10 in <b>Settings > System > Display</b>.</li>
+</ul>
 <h1>Installation</h1>
 I've successfully built the app on Windows 10/11 and macOS X 12.0, but have yet to try it on Linux where some OS specific functions such as window resizing and Open in File Explorer may not work properly (if it builds at all. I've yet to set up preprocessing directives for Linux).<br></br>
 <ol>
