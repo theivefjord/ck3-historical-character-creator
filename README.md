@@ -1,5 +1,5 @@
 <h1 align="center">CK3 Historical Character Creator</h1>
-<p align="center">A modding tool that aims to make the process of adding characters in the history files more interactive, and less writing the same thing over and over again.</p>
+<p align="center">A modding tool that aims to make the process of adding characters in the history files more interactive, and less writing the same thing over and over again.<br><br>Built with qmake using Qt 6</p>
 <h2>Why Use This Tool</h2>
 <p align: left;">Modding character history files by hand sucks ass because it's:</p>
 <ul style="margin-left: 20px; padding-left: 10px;">
